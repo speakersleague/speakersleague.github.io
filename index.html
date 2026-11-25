@@ -812,12 +812,28 @@
   let soundOn = localStorage.getItem(SOUND_KEY) !== "off";
   let hideClock = true;
 
+  function setPlaybackSession() {
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = "playback";
+    } catch (e) {}
+  }
+
+  function resumeAudio() {
+    setPlaybackSession();
+    try {
+      if (!audioCtx) return;
+      const state = audioCtx.state;
+      if (state === "suspended" || state === "interrupted") audioCtx.resume();
+    } catch (e) {}
+  }
+
   function unlockAudio() {
     try {
+      setPlaybackSession();
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       if (!audioCtx) audioCtx = new AC();
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      resumeAudio();
       const buf = audioCtx.createBuffer(1, 1, 22050);
       const src = audioCtx.createBufferSource();
       src.buffer = buf;
@@ -859,12 +875,211 @@
   let alarmTimer = 0;
   let alarmActive = false;
   let alarmEndsAt = 0;
+  let alarmUsingElement = false;
+  let alarmUrl = "";
+  let alarmEl = null;
+  let keeperUrl = "";
+  let keeperEl = null;
+  let keeperSrc = null;
+  let keeperGain = null;
+  let primeGen = 0;
   const ALARM_SECONDS = 15;
 
+  function floatToWavBlob(samples, sampleRate) {
+    const n = samples.length;
+    const dataSize = n * 2;
+    const ab = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(ab);
+    function writeStr(offset, str) {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    }
+    writeStr(0, "RIFF");
+    view.setUint32(4, 36 + dataSize, true);
+    writeStr(8, "WAVE");
+    writeStr(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeStr(36, "data");
+    view.setUint32(40, dataSize, true);
+    let o = 44;
+    for (let i = 0; i < n; i++) {
+      let s = samples[i];
+      if (s > 1) s = 1;
+      else if (s < -1) s = -1;
+      view.setInt16(o, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      o += 2;
+    }
+    return new Blob([ab], { type: "audio/wav" });
+  }
+
+  function makeAudioEl() {
+    const el = document.createElement("audio");
+    el.preload = "auto";
+    el.setAttribute("playsinline", "");
+    el.setAttribute("webkit-playsinline", "");
+    el.playsInline = true;
+    el.style.display = "none";
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function scheduleAlarm(ctx, t0) {
+    const dur = ALARM_SECONDS;
+    const oscA = ctx.createOscillator();
+    const oscB = ctx.createOscillator();
+    const g = ctx.createGain();
+    oscA.type = "square";
+    oscB.type = "triangle";
+    const step = 0.045;
+    for (let t = 0; t < dur; t += step) {
+      const high = Math.floor(t / step) % 2 === 0;
+      oscA.frequency.setValueAtTime(high ? 1568 : 1318, t0 + t);
+      oscB.frequency.setValueAtTime(high ? 2093 : 1760, t0 + t);
+    }
+    const burst = 0.38;
+    const gap = 0.18;
+    const cycle = burst + gap;
+    g.gain.setValueAtTime(0.0001, t0);
+    for (let t = 0; t + 0.02 < dur; t += cycle) {
+      const on = t0 + t;
+      const off = Math.min(t0 + dur, on + burst);
+      g.gain.setValueAtTime(0.0001, on);
+      g.gain.exponentialRampToValueAtTime(0.11, on + 0.012);
+      if (off - 0.02 > on + 0.02) g.gain.setValueAtTime(0.11, off - 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, off);
+    }
+    oscA.connect(g);
+    oscB.connect(g);
+    return { oscA: oscA, oscB: oscB, gain: g, dur: dur };
+  }
+
+  function bufferToWavBlob(buffer) {
+    const ch = buffer.getChannelData(0);
+    const copy = new Float32Array(ch.length);
+    copy.set(ch);
+    return floatToWavBlob(copy, buffer.sampleRate);
+  }
+
+  function buildKeeperWav() {
+    const sr = 22050;
+    const n = sr;
+    const samples = new Float32Array(n);
+    let seed = 12345;
+    for (let i = 0; i < n; i++) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      samples[i] = ((seed / 4294967296) * 2 - 1) * 0.0006;
+    }
+    keeperUrl = URL.createObjectURL(floatToWavBlob(samples, sr));
+    keeperEl = makeAudioEl();
+    keeperEl.loop = true;
+    keeperEl.src = keeperUrl;
+    keeperEl.load();
+  }
+
+  function buildAlarmAsset() {
+    try {
+      const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      if (!AC) return;
+      const sr = 22050;
+      const offline = new AC(1, Math.ceil(sr * ALARM_SECONDS), sr);
+      const sched = scheduleAlarm(offline, 0);
+      sched.gain.connect(offline.destination);
+      sched.oscA.start(0);
+      sched.oscB.start(0);
+      sched.oscA.stop(ALARM_SECONDS);
+      sched.oscB.stop(ALARM_SECONDS);
+      offline.startRendering().then(function (rendered) {
+        if (alarmUrl) URL.revokeObjectURL(alarmUrl);
+        alarmUrl = URL.createObjectURL(bufferToWavBlob(rendered));
+        if (!alarmEl) alarmEl = makeAudioEl();
+        alarmEl.src = alarmUrl;
+        alarmEl.load();
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  function primeAlarmElement() {
+    if (!soundOn || !alarmEl || !alarmEl.src) return;
+    const gen = ++primeGen;
+    try {
+      alarmEl.muted = true;
+      const finish = function () {
+        if (gen !== primeGen) return;
+        try {
+          alarmEl.pause();
+          alarmEl.currentTime = 0;
+          alarmEl.muted = false;
+        } catch (e) {}
+      };
+      const p = alarmEl.play();
+      if (p && p.then) p.then(finish).catch(function () { if (gen === primeGen) alarmEl.muted = false; });
+      else finish();
+    } catch (e) {}
+  }
+
+  function startKeeper() {
+    if (!soundOn) return;
+    setPlaybackSession();
+    unlockAudio();
+    try {
+      if (audioCtx && !keeperSrc) {
+        const sr = audioCtx.sampleRate;
+        const buf = audioCtx.createBuffer(1, sr, sr);
+        const data = buf.getChannelData(0);
+        let seed = 24680;
+        for (let i = 0; i < data.length; i++) {
+          seed = (seed * 1664525 + 1013904223) >>> 0;
+          data[i] = ((seed / 4294967296) * 2 - 1) * 0.0006;
+        }
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        src.loop = true;
+        const g = audioCtx.createGain();
+        g.gain.value = 1;
+        src.connect(g);
+        g.connect(audioCtx.destination);
+        src.start(0);
+        keeperSrc = src;
+        keeperGain = g;
+      }
+    } catch (e) {}
+    try {
+      if (keeperEl && keeperEl.src) {
+        const p = keeperEl.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+    } catch (e) {}
+  }
+
+  function stopKeeper() {
+    try { if (keeperSrc) keeperSrc.stop(); } catch (e) {}
+    try { if (keeperSrc) keeperSrc.disconnect(); } catch (e) {}
+    keeperSrc = null;
+    try { if (keeperGain) keeperGain.disconnect(); } catch (e) {}
+    keeperGain = null;
+    try {
+      if (keeperEl) {
+        keeperEl.pause();
+        keeperEl.currentTime = 0;
+      }
+    } catch (e) {}
+  }
+
   function stopAlarm() {
+    primeGen++;
     alarmActive = false;
     alarmEndsAt = 0;
+    alarmUsingElement = false;
     if (alarmTimer) { clearTimeout(alarmTimer); alarmTimer = 0; }
+    if (alarmEl) {
+      try { alarmEl.pause(); } catch (e) {}
+      try { alarmEl.currentTime = 0; } catch (e) {}
+    }
     const ctx = audioCtx;
     if (alarmGain && ctx) {
       try {
@@ -886,52 +1101,51 @@
     }
   }
 
-  function playAlarm() {
-    if (!soundOn) return;
+  function playAlarmFallback() {
     unlockAudio();
+    resumeAudio();
     if (!audioCtx) return;
-    stopAlarm();
     const ctx = audioCtx;
     const t0 = ctx.currentTime + 0.03;
-    const dur = ALARM_SECONDS;
-    const oscA = ctx.createOscillator();
-    const oscB = ctx.createOscillator();
-    const g = ctx.createGain();
-    oscA.type = "square";
-    oscB.type = "triangle";
-    oscA.__start = t0;
-    oscB.__start = t0;
-    const step = 0.045;
-    for (let t = 0; t < dur; t += step) {
-      const high = Math.floor(t / step) % 2 === 0;
-      oscA.frequency.setValueAtTime(high ? 1568 : 1318, t0 + t);
-      oscB.frequency.setValueAtTime(high ? 2093 : 1760, t0 + t);
-    }
-    const burst = 0.38;
-    const gap = 0.18;
-    const cycle = burst + gap;
-    g.gain.setValueAtTime(0.0001, t0);
-    for (let t = 0; t + 0.02 < dur; t += cycle) {
-      const on = t0 + t;
-      const off = Math.min(t0 + dur, on + burst);
-      g.gain.setValueAtTime(0.0001, on);
-      g.gain.exponentialRampToValueAtTime(0.11, on + 0.012);
-      if (off - 0.02 > on + 0.02) g.gain.setValueAtTime(0.11, off - 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, off);
-    }
-    oscA.connect(g);
-    oscB.connect(g);
-    g.connect(ctx.destination);
-    oscA.start(t0);
-    oscB.start(t0);
-    const end = t0 + dur;
-    oscA.stop(end);
-    oscB.stop(end);
-    alarmOscs = [oscA, oscB];
-    alarmGain = g;
+    const sched = scheduleAlarm(ctx, t0);
+    sched.oscA.__start = t0;
+    sched.oscB.__start = t0;
+    sched.gain.connect(ctx.destination);
+    sched.oscA.start(t0);
+    sched.oscB.start(t0);
+    const end = t0 + sched.dur;
+    sched.oscA.stop(end);
+    sched.oscB.stop(end);
+    alarmOscs = [sched.oscA, sched.oscB];
+    alarmGain = sched.gain;
+    alarmUsingElement = false;
+  }
+
+  function playAlarm() {
+    if (!soundOn) return;
+    setPlaybackSession();
+    resumeAudio();
+    stopAlarm();
     alarmActive = true;
-    alarmEndsAt = Date.now() + dur * 1000;
-    alarmTimer = setTimeout(stopAlarm, (dur + 0.2) * 1000);
+    alarmEndsAt = Date.now() + ALARM_SECONDS * 1000;
+    alarmTimer = setTimeout(stopAlarm, (ALARM_SECONDS + 0.2) * 1000);
+    if (alarmEl && alarmUrl) {
+      alarmUsingElement = true;
+      try {
+        alarmEl.muted = false;
+        alarmEl.volume = 1;
+        try { alarmEl.currentTime = 0; } catch (e) {}
+        const p = alarmEl.play();
+        if (p && p.catch) {
+          p.catch(function () {
+            if (!alarmActive) return;
+            playAlarmFallback();
+          });
+        }
+        return;
+      } catch (e) {}
+    }
+    playAlarmFallback();
   }
 
   function vibrate(pattern) {
@@ -952,7 +1166,19 @@
     try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
   }
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible" && running) requestWakeLock();
+    if (document.visibilityState !== "visible") return;
+    resumeAudio();
+    if (!running) return;
+    requestWakeLock();
+    maybeRingBell();
+    if (soundOn && keeperEl && keeperEl.paused) {
+      const p = keeperEl.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+  });
+  window.addEventListener("focus", function () {
+    resumeAudio();
+    if (running) maybeRingBell();
   });
 
   /* ----- list ----- */
@@ -1162,6 +1388,7 @@
     hideClock = true;
     updateClockToggle();
     stopAlarm();
+    stopKeeper();
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     elapsedMs = 0;
@@ -1174,7 +1401,12 @@
 
   function startTimer() {
     if (running || stopped || !currentType) return;
+    setPlaybackSession();
     unlockAudio();
+    if (soundOn) {
+      primeAlarmElement();
+      startKeeper();
+    }
     running = true;
     stopped = false;
     startTs = performance.now() - elapsedMs / speedMul();
@@ -1195,12 +1427,22 @@
     raf = 0;
     stopped = true;
     stopAlarm();
+    stopKeeper();
     releaseWakeLock();
     paint();
   }
 
+  function maybeRingBell() {
+    if (!running || !currentType || bellRang) return;
+    if (elapsedSec() < currentType.bell) return;
+    bellRang = true;
+    playAlarm();
+    vibrate([400, 120, 400, 120, 400, 120, 600]);
+  }
+
   function tick(now) {
     if (!running) return;
+    resumeAudio();
     elapsedMs = (now - startTs) * speedMul();
     const t = elapsedSec();
     const type = currentType;
@@ -1208,11 +1450,7 @@
       eligibleChimed = true;
       vibrate(200);
     }
-    if (!bellRang && t >= type.bell) {
-      bellRang = true;
-      playAlarm();
-      vibrate([400, 120, 400, 120, 400, 120, 600]);
-    }
+    maybeRingBell();
     paint();
     raf = requestAnimationFrame(tick);
   }
@@ -1346,9 +1584,18 @@
     b.addEventListener("click", function () {
       soundOn = !soundOn;
       localStorage.setItem(SOUND_KEY, soundOn ? "on" : "off");
-      if (!soundOn) stopAlarm();
+      if (!soundOn) {
+        stopAlarm();
+        stopKeeper();
+      } else {
+        setPlaybackSession();
+        unlockAudio();
+        if (running) {
+          primeAlarmElement();
+          startKeeper();
+        }
+      }
       updateSoundButton();
-      if (soundOn) { unlockAudio(); }
     });
   });
   $("pick-jsl").addEventListener("click", function () { openClub("jsl"); });
@@ -1444,11 +1691,15 @@
         if (!eligibleChimed && t >= currentType.eligibleAt && t < currentType.bell) {
           eligibleChimed = true;
         }
-        if (!bellRang && t >= currentType.bell) {
+        if (t < currentType.eligibleAt) eligibleChimed = false;
+        if (t < currentType.bell) {
+          if (bellRang || alarmActive) stopAlarm();
+          bellRang = false;
+        } else if (running) {
+          maybeRingBell();
+        } else if (!bellRang) {
           bellRang = true;
         }
-        if (t < currentType.eligibleAt) eligibleChimed = false;
-        if (t < currentType.bell) bellRang = false;
       }
       paint();
     },
@@ -1457,7 +1708,11 @@
     testMode: function () { return testMode; },
     hideClock: function () { return hideClock; },
     alarmOn: function () { return alarmActive; },
-    alarmMsLeft: function () { return alarmActive ? Math.max(0, alarmEndsAt - Date.now()) : 0; }
+    alarmMsLeft: function () { return alarmActive ? Math.max(0, alarmEndsAt - Date.now()) : 0; },
+    alarmReady: function () { return !!(alarmEl && alarmUrl); },
+    alarmElement: function () { return alarmEl; },
+    alarmViaElement: function () { return alarmUsingElement; },
+    keeperPlaying: function () { return !!(keeperEl && !keeperEl.paused); }
   };
 
   /* ----- init ----- */
@@ -1466,6 +1721,9 @@
   updateClockToggle();
   renderList();
   installManifest();
+  setPlaybackSession();
+  buildKeeperWav();
+  buildAlarmAsset();
   const params = new URLSearchParams(location.search);
   if (params.get("test") === "1" || params.get("test") === "true") setTestMode(true);
   const clubParam = (params.get("club") || "").toLowerCase();
