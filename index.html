@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#005B79" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="description" content="Speakers League and Junior Speakers League speech timekeeper" />
+  <title>Timekeeper</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAEyElEQVR4nO3cMW4bRxiG4VHgwoXLsBRgHSF9bmJfxD6AT+KjpM8RZEClUqZIp1SEJUK0uJxZ7j8fnwdwI5LCYvbVr1lx6Zv26ctTgxC/bX0AMJKgiSJoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJImiivNv6AEZ4+v5t60OIcPP569aH0O1m1v/wXMTrmzHw6YIW8uXNFPY0QQt5ezOEPcVFoZhrmOE8lA96hkW8JtXPR+mgqy/etap8XsoGXXnRqHt+Sl4U9i7W7vZu0JFke3y47/4e1S4UywXdE7OQz9cTd6WoS205zo15d3sn5k49a1hp+zH1W98iHm+/piO2I1soM6GX/pSLeV1L17fKlJ5yQs8S8z9//Xj167//+fGix3Gu3e3ddJO6xEXhkp/uGWI+FvKhWcJeEvXWF4hTTejqMZ8a8uHzq4c906Qus4ee3dKYR72WlzYP+tTtRuXpPCLI6lGfuv5bXxxuHjSMNEXQ6dN5je+1hsrnYW+KoOFU5YOuPBXWmKimdJ/yQcMSgiaKoIkiaKIImiiCJoqgO6xxU1H1G5WqEzRRBN1p5EQ1nfsJmiiCHmDEZDWdxxD0ID1BinmcqT6CVd0+zLTPFM5E0Ct4K2whr0fQKxLu5dlDE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0ETx1veKHv/+8erXd398vOhxXBNBr+BYyIePC3s8QQ/0VsjHni/sceyhB1ka86jX8pKgBxgRpKjHEDRRBN1p5GQ1pfsJmiiC7rDGRDWl+wiaKIImiqCJImiiCJoogu6wxj0Y7uvoI2iiCLrTyIlqOvcTNFEEPcCIyWo6jyHoQXqCFPM4PrEy0D7MU+/HEPJ4gl7BW2ELeT2CXpFwL88emiiCJoqgiSJoogiaKIImiqCJImiiCJoogiaKt75X9Pjfv69+fff+w4WP5HoIegXHQj58XNjjCXqgt0I+9nxhj2MPPcjSmEe9lpcEPcCIIEU9hqCJIuhOIyerKd1P0EQRdIc1Jqop3UfQRBE0UQRNFEETRdBEETRRygf9+HC/9SEctcZNRdVvVKp8PlqbIGhYQtCdRk7U6tN5BlMEXf3X3LWY4TxsHvTN569bH0K3EZM1ZTpvfT43D/pU1adDT5AzxFx9/fd8BGugfZin3mA0Q8itzRNzaxNN6NbmWdjd+w+/jPWtx2e19XajtSJBL1mIWaJu7We4h/9mMtN6t1Yk6KVmW+RZzbjOZYJe+utqxsWexePD/eL1rbDdaK1Q0Oc4Z+H5tXPWs0rMrRUL+tyFEXa/lDW8aZ++PG19EIeevn/rev3u9m7QkWQbEXCl6dxa0aBb64+a9VWLubViW47nKi4WP1U9P2WDbq3uol27yueldNCt1V68a1T9fJTdQx+yp95W9ZD3pgl6T9iXN0vMrU0Y9J6w1zVTxM9NG/Rz4h5j1oifiwga9sr/lQOWEDRRBE0UQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFH+B1tGRIivOliNAAAAAElFTkSuQmCC" />
+  <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAFHUlEQVR4nO3dMW4bRxiG4VGQIkXKsBRgHSF9bmJfxD6ATqKjpM8RZEAlU6ZIp1QCiEC0uOTM7vz7PU+piADB/V5yRBPMXfv89bVBqJ+2vgOwJQEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEO3nre/AKK9Pj1vfhd25+/Jt67vQ3d1e/h9hBr+uvcRQPgDD317lGMoGYPhzqRpByQCMf17VQij3LpDxz63a9SnzClDtgU1X5ZWgRAC3jP9w/9DxnuQ5vjxffdsKEezy3wGMvp/Tx3JpDK9Pj9NHMP3fAEue/Q/3D8Y/0DWP7+xH16kDWDp+1rE0hJkjmDYA45/fHiKYNoBLGf+2qj/+U74LdOmzRdUH/+8/v7/789/++LTq/ejp0j+QZ/ujuOy7QNXGf270536nWgyH+4eb3jLdynRHoEue/fc4/h632dol12W2vwWmC+AjCePvcdutVLs+5QKopMeAK0ZQSakAKj279BxutQgqXaepApjtfHitEYOtFsGPzHSdpwoA1lYmgEovq9S5XmUCqGLkUWVPx6BZCIBoAiCaAIgmAKIJgGgC6GzkpzirfUK0AgEQTQBEE8AAI44qjj9jCGCQnoM1/nEEMFCP4Rr/WAIY7JYBG/94AljBNUM2/nWU/VaIak4HvcevRalKABsw9Hk4AhFNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRfBZoA8e/vr/788Pvn1a9HwhgNedGf+53xLAOR6AVXDL+HrdhOQEMdsuQRTCeAAbqMWARjCWAQXoOVwTjCGCAEYMVwRgCIJoAiCaAzkYeVRyD+hMA0QRANAEQTQBEEwDRBNDZyE9x+oRofwIgmgCIJoABRhxVHH/GEMAgPQdr/OMIYKAewzX+sQQw2C0DNv7xBLCCa4Zs/OvwrRArOR20r0WZhwA2YOjzcAQimgCIJgCiCYBoAiCaAIgmAKIJgGgCIJoAiCYAovks0AaO//7z7s8Pv/y68j1BACs5N/pzvyOGdTgCreCS8fe4DcsJYLBbhiyC8QQwUI8Bi2AsAQzSc7giGEcAA4wYrAjGEADRBEA0AXQ28qjiGNSfAIgmAKIJgGgCIJoAiCaAzkZ+itMnRPsrE8Dx5Xnru8ACVa5XmQBgBAEMMOKo4vgzxlQB3H359sP/XuVltbW+g602/o+u00fXeU1TBbA3PYZbbfzVlAug0qtAa7cNuOL4q12f6QKY6eWxl2uGXHH8l5jt+pb8Vojjy3M73D9sfTcWOR30Xr8Wpdqzf2tFA2itZgRvqg/9PRXH39qER6DWLn+ZrPqg782l12G2409rkwbQmgiqqDz+1iYOYAkRbGMPj/vUASx51tjDxaji+PK86PGe9dm/tckDaG15BEIY55rHd+bxt9baXfv89XXrO3GJ16fHq25X9Z2iWdzyhDL7+FsrFEBr10fA+iqMv7UCR6BTVR7UdJWuU6kAWqv14Caqdn1KHYFOOQ7Npdrw35QN4I0Qtld1/K3tIIA3QlhX5dGf2k0A/yeI/vYy+lO7DQAuUe5dIOhJAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQTQBEEwDRBEA0ARBNAEQTANEEQDQBEE0ARBMA0QRANAEQ7T8z3FZTmQ4vXwAAAABJRU5ErkJggg==" />
+  <style>
+    :root {
+      --teal: #005B79;
+      --teal-dark: #003F54;
+      --coral: #DA6A52;
+      --coral-dark: #C15540;
+      --green: #00E000;
+      --yellow: #FFEB00;
+      --red: #FF0A0A;
+      --pre: #3A4149;
+      --ink: #102027;
+      --paper: #F4F7F8;
+      --card: #FFFFFF;
+      --muted: #4A5A62;
+      --line: #D4DEE3;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%;
+      height: 100dvh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    button, input { font-family: inherit; }
+    button { cursor: pointer; border: none; }
+    .screen {
+      position: absolute; inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .screen.active { display: flex; }
+
+    /* ===== CHOOSER + CLUB PAGES ===== */
+    #chooser, #club-jsl, #club-sl {
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .home-header {
+      background: var(--teal);
+      color: #fff;
+      padding: calc(14px + var(--safe-top)) 16px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .home-header img.logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: #fff;
+      flex-shrink: 0;
+    }
+    .home-titles { flex: 1; min-width: 0; }
+    .home-titles h1 {
+      margin: 0; font-size: 1.45rem; letter-spacing: 0.02em;
+      font-weight: 800; line-height: 1.1;
+    }
+    .home-titles p {
+      margin: 2px 0 0; font-size: 0.78rem; opacity: 0.9; font-weight: 600;
+    }
+    .icon-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      font-size: 1.35rem;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+    .icon-btn[aria-pressed="false"] { opacity: 0.7; }
+    .home-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 12px 14px calc(24px + var(--safe-bottom));
+    }
+    .group { margin: 8px 0 16px; }
+    .group h2 {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 800;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .type-btn {
+      background: var(--card);
+      border: 3px solid var(--teal);
+      border-radius: 16px;
+      padding: 12px 8px 10px;
+      text-align: center;
+      color: var(--ink);
+      box-shadow: 0 2px 0 var(--teal-dark);
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .type-btn:active { transform: translateY(2px); box-shadow: none; }
+    .type-btn .emoji { font-size: 2.15rem; line-height: 1; }
+    .type-btn .label { font-size: 1.02rem; font-weight: 800; line-height: 1.15; margin-top: 4px; }
+    .type-btn .times { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-top: 4px; letter-spacing: 0.01em; }
+    .type-btn.coral { border-color: var(--coral); box-shadow: 0 2px 0 var(--coral-dark); }
+    .legend {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .legend strong { color: var(--ink); }
+    .dot { display: inline-block; width: 0.7em; height: 0.7em; border-radius: 50%; vertical-align: middle; margin-right: 2px; border: 1px solid rgba(0,0,0,0.2); }
+    .dot.g { background: var(--green); }
+    .dot.y { background: var(--yellow); }
+    .dot.r { background: var(--red); }
+
+    .list-card {
+      background: #fff;
+      border: 2px solid var(--teal);
+      border-radius: 16px;
+      padding: 12px;
+      margin-top: 4px;
+    }
+    .list-card h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--teal);
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      font-size: 0.75rem;
+    }
+    .col h3 {
+      margin: 0 0 6px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--teal);
+      font-weight: 800;
+      border-bottom: 2px solid var(--coral);
+      padding-bottom: 3px;
+    }
+    .col ul { list-style: none; margin: 0; padding: 0; }
+    .col li { padding: 3px 0; border-bottom: 1px solid var(--line); line-height: 1.25; word-break: break-word; }
+    .col .empty { color: var(--muted); font-style: italic; }
+    .ok { color: #0B7A0B; font-weight: 800; }
+    .bad { color: #C00000; font-weight: 800; }
+    .clear-btn, .text-btn {
+      background: transparent;
+      color: var(--coral);
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 8px 4px;
+      text-decoration: underline;
+    }
+    .install-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      margin: 14px 8px 4px;
+      line-height: 1.4;
+    }
+    .test-reveal {
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+      background: #FFF6D8;
+      border: 2px dashed #C9A000;
+      border-radius: 12px;
+      padding: 10px;
+      font-weight: 700;
+    }
+    .test-reveal.show { display: block; }
+    .test-reveal label { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; }
+    .switch { width: 46px; height: 28px; appearance: none; background: #ccc; border-radius: 14px; position: relative; outline: none; }
+    .switch:checked { background: var(--coral); }
+    .switch::after {
+      content: ""; position: absolute; top: 3px; left: 3px;
+      width: 22px; height: 22px; background: #fff; border-radius: 50%;
+      transition: left 0.15s;
+    }
+    .switch:checked::after { left: 21px; }
+
+    .header-back {
+      min-width: 52px; height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      border: 2px solid rgba(255,255,255,0.35);
+      padding: 0 10px;
+      flex-shrink: 0;
+    }
+    .header-back:active { background: rgba(255,255,255,0.28); }
+    .chooser-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 16px calc(24px + var(--safe-bottom));
+    }
+    .club-picks {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      min-height: 340px;
+    }
+    .club-pick {
+      width: 100%;
+      min-height: 168px;
+      border-radius: 24px;
+      border: 4px solid var(--teal);
+      background: #fff;
+      box-shadow: 0 5px 0 var(--teal-dark);
+      color: var(--teal);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 22px 16px;
+      text-align: center;
+    }
+    .club-pick:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--teal-dark); }
+    .club-pick.sl {
+      border-color: var(--coral);
+      box-shadow: 0 5px 0 var(--coral-dark);
+    }
+    .club-pick.sl:active { box-shadow: 0 2px 0 var(--coral-dark); }
+    .club-pick .emoji-row { font-size: 2.5rem; line-height: 1; }
+    .club-pick .name { font-size: 1.55rem; font-weight: 900; line-height: 1.15; color: var(--ink); }
+    .club-pick .ages { font-size: 1.05rem; font-weight: 700; color: var(--muted); }
+    .type-btn.span2 { grid-column: 1 / -1; min-height: 108px; }
+
+    /* ===== TIMER ===== */
+    #timer {
+      color: #fff;
+      background: var(--pre);
+      transition: background-color 0.35s ease;
+    }
+    #timer.phase-pre { background: var(--pre); color: #fff; }
+    #timer.phase-green { background: var(--green); color: #000; }
+    #timer.phase-yellow { background: var(--yellow); color: #000; }
+    #timer.phase-red, #timer.phase-bell { background: var(--red); color: #fff; }
+    #timer.pulsing {
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.28); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #timer.pulsing { animation-duration: 2.4s; }
+    }
+    .timer-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: calc(8px + var(--safe-top)) 10px 8px;
+      flex-shrink: 0;
+    }
+    .timer-bar .tb {
+      min-width: 52px; height: 44px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.22);
+      color: inherit;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 0 10px;
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+    #timer.phase-green .tb, #timer.phase-yellow .tb {
+      background: rgba(0,0,0,0.12);
+      border-color: rgba(0,0,0,0.35);
+    }
+    .timer-title {
+      flex: 1; text-align: center;
+      font-weight: 800; font-size: 1.05rem; line-height: 1.15;
+    }
+    .timer-title .sub { display: block; font-size: 0.72rem; font-weight: 700; opacity: 0.85; }
+    .test-banner {
+      display: none;
+      text-align: center;
+      background: #111;
+      color: #FFEB00;
+      font-weight: 800;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      padding: 4px 8px;
+      text-transform: uppercase;
+    }
+    .test-banner.on { display: block; }
+    .timer-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px 12px;
+      gap: 8px;
+    }
+    .clock {
+      font-size: clamp(4.2rem, 22vw, 7.2rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    }
+    .clock.hidden-clock { letter-spacing: 0.12em; }
+    .status-line {
+      min-height: 1.6rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      opacity: 0.95;
+      text-align: center;
+    }
+    .badge {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #fff;
+      color: #0B7A0B;
+      border: 4px solid #0B7A0B;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      padding: 10px 22px;
+      border-radius: 999px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+      text-align: center;
+      line-height: 1.1;
+    }
+    .badge.show { display: flex; }
+    #timer.phase-bell .badge.eligible, #timer.over .badge.eligible { display: none; }
+    .badge.overtime {
+      display: none;
+      background: #111;
+      color: #FFEB00;
+      border-color: #FFEB00;
+      color: #FFEB00;
+    }
+    .badge.overtime.show { display: flex; }
+    @keyframes pop {
+      0% { transform: scale(0.6); opacity: 0; }
+      70% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .timer-actions {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: calc(12px + var(--safe-bottom));
+    }
+    .huge {
+      width: 100%;
+      height: 88px;
+      border-radius: 22px;
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      border: 4px solid rgba(0,0,0,0.25);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.25);
+    }
+    .huge:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
+    #btn-start { background: #fff; color: var(--teal); display: none; }
+    #btn-start.show { display: block; }
+    #btn-stop { background: var(--coral); color: #fff; display: none; }
+    #btn-stop.show { display: block; }
+    #btn-reset {
+      background: rgba(0,0,0,0.2);
+      color: inherit;
+      height: 52px;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    #timer.phase-green #btn-reset, #timer.phase-yellow #btn-reset {
+      border-color: rgba(0,0,0,0.3);
+    }
+
+    /* ===== RESULT ===== */
+    #result {
+      background: var(--paper);
+    }
+    .result-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 18px calc(20px + var(--safe-bottom));
+    }
+    .result-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 22px 18px;
+      border: 3px solid var(--teal);
+      text-align: center;
+      margin-top: 8px;
+    }
+    .result-card .who { font-size: 1.1rem; font-weight: 800; color: var(--teal); }
+    .result-time {
+      font-size: 3.4rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin: 10px 0 6px;
+      color: var(--ink);
+    }
+    .result-label { font-size: 0.9rem; color: var(--muted); font-weight: 700; }
+    .verdict {
+      margin: 16px 0 8px;
+      font-size: 1.7rem;
+      font-weight: 900;
+      padding: 12px;
+      border-radius: 16px;
+    }
+    .verdict.yes { background: #D6F5D6; color: #0B7A0B; }
+    .verdict.no { background: #FFD6D6; color: #9B0000; }
+    .verdict .why { display: block; font-size: 1rem; font-weight: 700; margin-top: 4px; }
+    .field { text-align: left; margin: 16px 0 8px; }
+    .field label { display: block; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; color: var(--teal); }
+    .field input {
+      width: 100%;
+      font-size: 16px;
+      padding: 12px 12px;
+      border: 2px solid var(--teal);
+      border-radius: 12px;
+      outline: none;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    .add-btn, .again-btn, .home-btn {
+      width: 100%;
+      height: 56px;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-top: 10px;
+    }
+    .add-btn { background: var(--teal); color: #fff; }
+    .add-btn[disabled] { opacity: 0.5; }
+    .again-btn { background: var(--coral); color: #fff; }
+    .home-btn { background: #fff; color: var(--teal); border: 3px solid var(--teal); }
+    .added-note { display: none; color: #0B7A0B; font-weight: 800; margin-top: 8px; }
+    .added-note.show { display: block; }
+  </style>
+</head>
+<body>
+  <!-- CHOOSER -->
+  <section id="chooser" class="screen active" aria-label="Choose a league">
+    <header class="home-header">
+      <img class="logo" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAEyElEQVR4nO3cMW4bRxiG4VHgwoXLsBRgHSF9bmJfxD6AT+KjpM8RZEClUqZIp1SEJUK0uJxZ7j8fnwdwI5LCYvbVr1lx6Zv26ctTgxC/bX0AMJKgiSJoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJImiivNv6AEZ4+v5t60OIcPP569aH0O1m1v/wXMTrmzHw6YIW8uXNFPY0QQt5ezOEPcVFoZhrmOE8lA96hkW8JtXPR+mgqy/etap8XsoGXXnRqHt+Sl4U9i7W7vZu0JFke3y47/4e1S4UywXdE7OQz9cTd6WoS205zo15d3sn5k49a1hp+zH1W98iHm+/piO2I1soM6GX/pSLeV1L17fKlJ5yQs8S8z9//Xj167//+fGix3Gu3e3ddJO6xEXhkp/uGWI+FvKhWcJeEvXWF4hTTejqMZ8a8uHzq4c906Qus4ee3dKYR72WlzYP+tTtRuXpPCLI6lGfuv5bXxxuHjSMNEXQ6dN5je+1hsrnYW+KoOFU5YOuPBXWmKimdJ/yQcMSgiaKoIkiaKIImiiCJoqgO6xxU1H1G5WqEzRRBN1p5EQ1nfsJmiiCHmDEZDWdxxD0ID1BinmcqT6CVd0+zLTPFM5E0Ct4K2whr0fQKxLu5dlDE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0ETx1veKHv/+8erXd398vOhxXBNBr+BYyIePC3s8QQ/0VsjHni/sceyhB1ka86jX8pKgBxgRpKjHEDRRBN1p5GQ1pfsJmiiC7rDGRDWl+wiaKIImiqCJImiiCJoogu6wxj0Y7uvoI2iiCLrTyIlqOvcTNFEEPcCIyWo6jyHoQXqCFPM4PrEy0D7MU+/HEPJ4gl7BW2ELeT2CXpFwL88emiiCJoqgiSJoogiaKIImiqCJImiiCJoogiaKt75X9Pjfv69+fff+w4WP5HoIegXHQj58XNjjCXqgt0I+9nxhj2MPPcjSmEe9lpcEPcCIIEU9hqCJIuhOIyerKd1P0EQRdIc1Jqop3UfQRBE0UQRNFEETRdBEETRRygf9+HC/9SEctcZNRdVvVKp8PlqbIGhYQtCdRk7U6tN5BlMEXf3X3LWY4TxsHvTN569bH0K3EZM1ZTpvfT43D/pU1adDT5AzxFx9/fd8BGugfZin3mA0Q8itzRNzaxNN6NbmWdjd+w+/jPWtx2e19XajtSJBL1mIWaJu7We4h/9mMtN6t1Yk6KVmW+RZzbjOZYJe+utqxsWexePD/eL1rbDdaK1Q0Oc4Z+H5tXPWs0rMrRUL+tyFEXa/lDW8aZ++PG19EIeevn/rev3u9m7QkWQbEXCl6dxa0aBb64+a9VWLubViW47nKi4WP1U9P2WDbq3uol27yueldNCt1V68a1T9fJTdQx+yp95W9ZD3pgl6T9iXN0vMrU0Y9J6w1zVTxM9NG/Rz4h5j1oifiwga9sr/lQOWEDRRBE0UQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBEETRRBE0UQRNF0EQRNFH+B1tGRIivOliNAAAAAElFTkSuQmCC" />
+      <div class="home-titles">
+        <h1 class="app-title">Timekeeper</h1>
+        <p>Pick a league to begin</p>
+      </div>
+      <button type="button" class="icon-btn sound-toggle" aria-pressed="true" aria-label="Sound on" title="Sound">🔊</button>
+    </header>
+    <div class="chooser-body">
+      <div class="test-banner">Test mode · 10× speed</div>
+      <div class="club-picks">
+        <button type="button" class="club-pick" id="pick-jsl">
+          <div class="emoji-row">🐣 🐥 🦅</div>
+          <div class="name">Junior Speakers League</div>
+          <div class="ages">ages 7–9</div>
+        </button>
+        <button type="button" class="club-pick sl" id="pick-sl">
+          <div class="emoji-row">🎤 👋 🏆</div>
+          <div class="name">Speakers League</div>
+        </button>
+      </div>
+      <p class="install-hint">
+        Add this to your Home Screen for a full-screen timer.<br />
+        iPhone: Share → Add to Home Screen.<br />
+        Android: Menu → Add to Home screen.
+      </p>
+      <div class="test-reveal">
+        <label>
+          <input type="checkbox" class="switch test-toggle" />
+          Test mode (10× speed)
+        </label>
+        <div style="font-size:0.8rem;font-weight:600;margin-top:6px;color:#6a5a00">For demos only. Times run ten times faster.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JSL CLUB -->
+  <section id="club-jsl" class="screen" aria-label="Junior Speakers League">
+    <header class="home-header">
+      <button type="button" class="header-back btn-club-back">Back</button>
+      <div class="home-titles">
+        <h1 class="app-title">Junior Speakers League</h1>
+        <p>ages 7–9</p>
+      </div>
+      <button type="button" class="icon-btn sound-toggle" aria-pressed="true" aria-label="Sound on" title="Sound">🔊</button>
+    </header>
+    <div class="home-body">
+      <div class="test-banner">Test mode · 10× speed</div>
+      <p class="legend">
+        Press the button for the kind of speech. Then press <strong>START</strong> when the speaker begins.
+        <br />
+        <span class="dot g"></span> Green = keep going
+        · <span class="dot y"></span> Yellow = wrap up
+        · <span class="dot r"></span> Red = almost out of time
+        · 🔔 Bell = too long
+      </p>
+      <div class="group">
+        <h2>Speeches</h2>
+        <div class="grid" id="jsl-grid"></div>
+      </div>
+      <div class="group">
+        <h2>Everyone</h2>
+        <div class="grid" id="jsl-all-grid"></div>
+      </div>
+      <div class="list-card">
+        <h2>Eligibility List <button type="button" class="clear-btn btn-clear-list">Clear</button></h2>
+        <div class="cols">
+          <div class="col"><h3>Speakers</h3><ul data-list="speakers"></ul></div>
+          <div class="col"><h3>Evaluators</h3><ul data-list="evaluators"></ul></div>
+          <div class="col"><h3>Impromptu</h3><ul data-list="impromptu"></ul></div>
+        </div>
+      </div>
+      <div class="test-reveal">
+        <label>
+          <input type="checkbox" class="switch test-toggle" />
+          Test mode (10× speed)
+        </label>
+        <div style="font-size:0.8rem;font-weight:600;margin-top:6px;color:#6a5a00">For demos only. Times run ten times faster.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SL CLUB -->
+  <section id="club-sl" class="screen" aria-label="Speakers League">
+    <header class="home-header">
+      <button type="button" class="header-back btn-club-back">Back</button>
+      <div class="home-titles">
+        <h1 class="app-title">Speakers League</h1>
+        <p>Speeches, GTKY &amp; Capstone</p>
+      </div>
+      <button type="button" class="icon-btn sound-toggle" aria-pressed="true" aria-label="Sound on" title="Sound">🔊</button>
+    </header>
+    <div class="home-body">
+      <div class="test-banner">Test mode · 10× speed</div>
+      <p class="legend">
+        Press the button for the kind of speech. Then press <strong>START</strong> when the speaker begins.
+        <br />
+        <span class="dot g"></span> Green = keep going
+        · <span class="dot y"></span> Yellow = wrap up
+        · <span class="dot r"></span> Red = almost out of time
+        · 🔔 Bell = too long
+      </p>
+      <div class="group">
+        <h2>Speeches</h2>
+        <div class="grid" id="sl-grid"></div>
+      </div>
+      <div class="group">
+        <h2>Everyone</h2>
+        <div class="grid" id="sl-all-grid"></div>
+      </div>
+      <div class="list-card">
+        <h2>Eligibility List <button type="button" class="clear-btn btn-clear-list">Clear</button></h2>
+        <div class="cols">
+          <div class="col"><h3>Speakers</h3><ul data-list="speakers"></ul></div>
+          <div class="col"><h3>Evaluators</h3><ul data-list="evaluators"></ul></div>
+          <div class="col"><h3>Impromptu</h3><ul data-list="impromptu"></ul></div>
+        </div>
+      </div>
+      <div class="test-reveal">
+        <label>
+          <input type="checkbox" class="switch test-toggle" />
+          Test mode (10× speed)
+        </label>
+        <div style="font-size:0.8rem;font-weight:600;margin-top:6px;color:#6a5a00">For demos only. Times run ten times faster.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMER -->
+  <section id="timer" class="screen phase-pre" aria-label="Timer">
+    <div class="timer-bar">
+      <button type="button" class="tb" id="btn-back">Back</button>
+      <div class="timer-title" id="timer-type-label"></div>
+      <button type="button" class="tb" id="clock-toggle" aria-pressed="false" aria-label="Hide clock">👁</button>
+    </div>
+    <div class="test-banner" id="test-banner-timer">Test mode · 10× speed</div>
+    <div class="timer-main">
+      <div class="clock" id="clock" aria-live="polite">0:00</div>
+      <div class="status-line" id="status-line">Press START when they begin</div>
+      <div class="badge eligible" id="eligible-badge" role="status">⭐ ELIGIBLE!</div>
+      <div class="badge overtime" id="overtime-badge" role="alert">🔔 TIME!<br /><span style="font-size:1rem;font-weight:800">Over time – not eligible</span></div>
+    </div>
+    <div class="timer-actions" style="padding-left:16px;padding-right:16px;align-self:center">
+      <button type="button" class="huge show" id="btn-start">START</button>
+      <button type="button" class="huge" id="btn-stop">STOP</button>
+      <button type="button" id="btn-reset">Reset</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen" aria-label="Result">
+    <header class="home-header">
+      <div class="home-titles">
+        <h1>Result</h1>
+        <p id="result-type-label"></p>
+      </div>
+    </header>
+    <div class="result-body">
+      <div class="result-card">
+        <div class="result-label">Time spoken</div>
+        <div class="result-time" id="result-time">0:00</div>
+        <div class="verdict" id="verdict"></div>
+        <form id="add-form" autocomplete="off">
+          <div class="field">
+            <label for="name-input">Name (optional)</label>
+            <input id="name-input" name="speaker" maxlength="60" placeholder="Who spoke?" enterkeyhint="done" />
+          </div>
+          <button type="submit" class="add-btn" id="btn-add">Add to Eligibility List</button>
+          <div class="added-note" id="added-note">Saved on the Eligibility List</div>
+        </form>
+        <button type="button" class="again-btn" id="btn-again">Time someone else</button>
+        <button type="button" class="home-btn" id="btn-home">Home</button>
+      </div>
+    </div>
+  </section>
+
+<script>
+(function () {
+  "use strict";
+
+  const TYPES = {
+    jsl_basic: {
+      id: "jsl_basic", group: "jsl", listCol: "speakers",
+      emoji: "🐣", name: "Basic speech", short: "Basic",
+      green: 180, yellow: 240, red: 300, bell: 330, eligibleAt: 180,
+      times: "3:00* · 4:00 · 5:00"
+    },
+    jsl_intermediate: {
+      id: "jsl_intermediate", group: "jsl", listCol: "speakers",
+      emoji: "🐥", name: "Intermediate speech", short: "Intermediate",
+      green: 240, yellow: 300, red: 360, bell: 390, eligibleAt: 240,
+      times: "4:00* · 5:00 · 6:00"
+    },
+    jsl_advanced: {
+      id: "jsl_advanced", group: "jsl", listCol: "speakers",
+      emoji: "🦅", name: "Advanced speech", short: "Advanced",
+      green: 300, yellow: 360, red: 420, bell: 450, eligibleAt: 300,
+      times: "5:00* · 6:00 · 7:00"
+    },
+    sl_speech: {
+      id: "sl_speech", group: "sl", listCol: "speakers",
+      emoji: "🎤", name: "Speech", short: "Speech",
+      green: 300, yellow: 360, red: 420, bell: 450, eligibleAt: 300,
+      times: "5:00* · 6:00 · 7:00"
+    },
+    sl_gtky: {
+      id: "sl_gtky", group: "sl", listCol: "speakers",
+      emoji: "👋", name: "GTKY speech", short: "GTKY",
+      green: 240, yellow: 300, red: 360, bell: 390, eligibleAt: 240,
+      times: "4:00* · 5:00 · 6:00"
+    },
+    sl_capstone: {
+      id: "sl_capstone", group: "sl", listCol: "speakers",
+      emoji: "🏆", name: "Capstone", short: "Capstone",
+      green: null, yellow: 390, red: 420, bell: 450, eligibleAt: 390,
+      times: "6:30* · 7:00"
+    },
+    evaluator: {
+      id: "evaluator", group: "all", listCol: "evaluators",
+      emoji: "📝", name: "Evaluator", short: "Evaluator",
+      green: 60, yellow: 90, red: 120, bell: 150, eligibleAt: 60,
+      times: "1:00* · 1:30 · 2:00"
+    },
+    impromptu: {
+      id: "impromptu", group: "all", listCol: "impromptu",
+      emoji: "⚡", name: "Impromptu", short: "Impromptu",
+      green: 60, yellow: 90, red: 120, bell: 150, eligibleAt: 120,
+      times: "1:00 · 1:30 · 2:00*"
+    }
+  };
+
+  const LIST_KEY = "sl-timekeeper-list-v1";
+  const SOUND_KEY = "sl-timekeeper-sound";
+  const CLOCK_KEY = "sl-timekeeper-hide-clock";
+  const CLUB_KEY = "sl-timekeeper-club";
+
+  function formatTime(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return m + ":" + String(s).padStart(2, "0");
+  }
+
+  function phaseAt(type, t) {
+    if (t >= type.bell) return "bell";
+    if (t >= type.red) return "red";
+    if (t >= type.yellow) return "yellow";
+    if (type.green != null && t >= type.green) return "green";
+    return "pre";
+  }
+
+  function resultOf(type, t) {
+    if (t >= type.bell) return { eligible: false, reason: "over_time", label: "Not eligible", why: "Over time" };
+    if (t >= type.eligibleAt) return { eligible: true, reason: "ok", label: "Eligible", why: "Made time" };
+    return { eligible: false, reason: "too_short", label: "Not eligible", why: "Too short" };
+  }
+
+  /* ----- audio ----- */
+  let audioCtx = null;
+  let soundOn = localStorage.getItem(SOUND_KEY) !== "off";
+  let hideClock = localStorage.getItem(CLOCK_KEY) === "on";
+
+  function unlockAudio() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      const buf = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      src.start(0);
+    } catch (e) {}
+  }
+
+  function tone(freq, start, dur, type, gain, freqEnd) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, start);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, start + dur);
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(gain, start + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(start);
+    osc.stop(start + dur + 0.02);
+  }
+
+  function playHappyChime() {
+    if (!soundOn) return;
+    unlockAudio();
+    if (!audioCtx) return;
+    const t0 = audioCtx.currentTime + 0.02;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((f, i) => {
+      tone(f, t0 + i * 0.11, 0.28, "triangle", 0.18);
+      tone(f * 2, t0 + i * 0.11, 0.18, "sine", 0.05);
+    });
+  }
+
+  function playBell() {
+    if (!soundOn) return;
+    unlockAudio();
+    if (!audioCtx) return;
+    const t0 = audioCtx.currentTime + 0.02;
+    for (let i = 0; i < 5; i++) {
+      const t = t0 + i * 0.42;
+      // bright alarm-bell ding with partials
+      tone(880, t, 0.55, "sine", 0.32, 740);
+      tone(880 * 2.0, t, 0.4, "sine", 0.14, 1500);
+      tone(880 * 2.76, t, 0.35, "sine", 0.08);
+      tone(440, t, 0.6, "triangle", 0.12, 400);
+    }
+  }
+
+  function vibrate(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
+  }
+
+  /* ----- wake lock ----- */
+  let wakeLock = null;
+  async function requestWakeLock() {
+    try {
+      if (navigator.wakeLock) {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", function () {});
+      }
+    } catch (e) {}
+  }
+  function releaseWakeLock() {
+    try { if (wakeLock) { wakeLock.release(); wakeLock = null; } } catch (e) {}
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && running) requestWakeLock();
+  });
+
+  /* ----- list ----- */
+  function loadList() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(LIST_KEY) || "null");
+      if (raw && Array.isArray(raw.speakers)) return raw;
+    } catch (e) {}
+    return { speakers: [], evaluators: [], impromptu: [] };
+  }
+  function saveList(list) {
+    localStorage.setItem(LIST_KEY, JSON.stringify(list));
+  }
+  function renderList() {
+    const list = loadList();
+    document.querySelectorAll("[data-list]").forEach(function (ul) {
+      const col = ul.getAttribute("data-list");
+      ul.innerHTML = "";
+      if (!list[col] || !list[col].length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "None yet";
+        ul.appendChild(li);
+        return;
+      }
+      list[col].forEach(function (row) {
+        const li = document.createElement("li");
+        const mark = row.eligible ? '<span class="ok">✅</span>' : '<span class="bad">❌</span>';
+        const nm = (row.name || "—");
+        li.innerHTML = mark + " " + escapeHtml(nm) + "<br />" + escapeHtml(row.time);
+        ul.appendChild(li);
+      });
+    });
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
+    });
+  }
+
+  /* ----- state ----- */
+  let currentType = null;
+  let currentClub = null;
+  let running = false;
+  let startTs = 0;
+  let elapsedMs = 0;
+  let raf = 0;
+  let testMode = false;
+  let speed = 1;
+  let eligibleChimed = false;
+  let bellRang = false;
+  let addedThisResult = false;
+  let titleTaps = [];
+
+  const $ = function (id) { return document.getElementById(id); };
+
+  function speedMul() { return testMode ? 10 : 1; }
+
+  function elapsedSec() { return elapsedMs / 1000; }
+
+  function setTestMode(on) {
+    const was = speedMul();
+    testMode = !!on;
+    speed = speedMul();
+    if (running && was !== speed) {
+      // keep the same speech-time when toggling
+      startTs = performance.now() - elapsedMs / speed;
+    }
+    document.querySelectorAll(".test-toggle").forEach(function (el) { el.checked = testMode; });
+    document.querySelectorAll(".test-banner").forEach(function (el) { el.classList.toggle("on", testMode); });
+    if (testMode) document.querySelectorAll(".test-reveal").forEach(function (el) { el.classList.add("show"); });
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
+    const el = $(id);
+    el.classList.add("active");
+    const body = el.querySelector(".home-body, .chooser-body");
+    if (body) body.scrollTop = 0;
+  }
+
+  function clubScreenId(club) {
+    return club === "sl" ? "club-sl" : "club-jsl";
+  }
+
+  function openChooser() {
+    currentClub = null;
+    showScreen("chooser");
+  }
+
+  function openClub(club, save) {
+    if (club !== "jsl" && club !== "sl") return;
+    currentClub = club;
+    if (save !== false) {
+      try { localStorage.setItem(CLUB_KEY, club); } catch (e) {}
+    }
+    showScreen(clubScreenId(club));
+    renderList();
+  }
+
+  function goClubHome() {
+    currentType = null;
+    if (currentClub === "jsl" || currentClub === "sl") openClub(currentClub, false);
+    else openChooser();
+  }
+
+  var CLUB_TYPES = {
+    jsl: ["jsl_basic", "jsl_intermediate", "jsl_advanced", "evaluator", "impromptu"],
+    sl: ["sl_speech", "sl_gtky", "sl_capstone", "evaluator", "impromptu"]
+  };
+
+  function makeTypeButton(id) {
+    const t = TYPES[id];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "type-btn" + (t.group === "all" ? " coral" : "");
+    btn.dataset.type = id;
+    btn.innerHTML = '<div class="emoji">' + t.emoji + '</div>' +
+      '<div class="label">' + t.name + '</div>' +
+      '<div class="times">' + t.times + '</div>';
+    btn.addEventListener("click", function () { openTimer(id); });
+    return btn;
+  }
+
+  function buildClubButtons() {
+    function fillSpeechGrid(gridId, ids) {
+      ids.forEach(function (id, i) {
+        const btn = makeTypeButton(id);
+        if (i === 2) btn.classList.add("span2");
+        $(gridId).appendChild(btn);
+      });
+    }
+    fillSpeechGrid("jsl-grid", CLUB_TYPES.jsl.slice(0, 3));
+    CLUB_TYPES.jsl.slice(3).forEach(function (id) { $("jsl-all-grid").appendChild(makeTypeButton(id)); });
+    fillSpeechGrid("sl-grid", CLUB_TYPES.sl.slice(0, 3));
+    CLUB_TYPES.sl.slice(3).forEach(function (id) { $("sl-all-grid").appendChild(makeTypeButton(id)); });
+  }
+
+  function updateSoundButton() {
+    document.querySelectorAll(".sound-toggle").forEach(function (b) {
+      b.textContent = soundOn ? "🔊" : "🔇";
+      b.setAttribute("aria-pressed", soundOn ? "true" : "false");
+      b.setAttribute("aria-label", soundOn ? "Sound on" : "Sound off");
+      b.title = soundOn ? "Sound on" : "Sound off";
+    });
+  }
+
+  function updateClockToggle() {
+    const b = $("clock-toggle");
+    b.textContent = hideClock ? "🙈" : "👁";
+    b.setAttribute("aria-pressed", hideClock ? "true" : "false");
+    b.setAttribute("aria-label", hideClock ? "Show clock" : "Hide clock");
+  }
+
+  function openTimer(typeId) {
+    currentType = TYPES[typeId];
+    resetTiming(false);
+    $("timer-type-label").innerHTML = currentType.emoji + " " + currentType.name +
+      '<span class="sub">' + currentType.times + '</span>';
+    showScreen("timer");
+    paint();
+  }
+
+  function resetTiming(keepScreen) {
+    running = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    elapsedMs = 0;
+    startTs = 0;
+    eligibleChimed = false;
+    bellRang = false;
+    releaseWakeLock();
+    $("btn-start").classList.add("show");
+    $("btn-stop").classList.remove("show");
+    $("eligible-badge").classList.remove("show");
+    $("overtime-badge").classList.remove("show");
+    $("timer").classList.remove("pulsing", "over");
+    if (keepScreen) paint();
+  }
+
+  function startTimer() {
+    if (running || !currentType) return;
+    unlockAudio();
+    running = true;
+    startTs = performance.now() - elapsedMs / speedMul();
+    $("btn-start").classList.remove("show");
+    $("btn-stop").classList.add("show");
+    requestWakeLock();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function stopTimer() {
+    if (!currentType) return;
+    if (running) {
+      const now = performance.now();
+      elapsedMs = (now - startTs) * speedMul();
+      running = false;
+    }
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    releaseWakeLock();
+    paint();
+    showResult();
+  }
+
+  function tick(now) {
+    if (!running) return;
+    elapsedMs = (now - startTs) * speedMul();
+    const t = elapsedSec();
+    const type = currentType;
+    if (!eligibleChimed && t >= type.eligibleAt && t < type.bell) {
+      eligibleChimed = true;
+      vibrate(200);
+    }
+    if (!bellRang && t >= type.bell) {
+      bellRang = true;
+      playBell();
+      vibrate([400, 120, 400, 120, 400, 120, 600]);
+    }
+    paint();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function paint() {
+    if (!currentType) return;
+    const t = elapsedSec();
+    const type = currentType;
+    const phase = phaseAt(type, t);
+    const pulsing = t >= type.bell - 10 && t < type.bell;
+    const elig = t >= type.eligibleAt && t < type.bell;
+    const over = t >= type.bell;
+
+    const timerEl = $("timer");
+    timerEl.classList.remove("phase-pre", "phase-green", "phase-yellow", "phase-red", "phase-bell", "pulsing", "over");
+    timerEl.classList.add("phase-" + phase);
+    if (pulsing) timerEl.classList.add("pulsing");
+    if (over) timerEl.classList.add("over");
+
+    const clock = $("clock");
+    if (hideClock) {
+      clock.textContent = "• • •";
+      clock.classList.add("hidden-clock");
+    } else {
+      clock.textContent = formatTime(t);
+      clock.classList.remove("hidden-clock");
+    }
+
+    $("eligible-badge").classList.toggle("show", elig);
+    $("overtime-badge").classList.toggle("show", over);
+
+    let status = "Press START when they begin";
+    if (running || t > 0) {
+      if (over) status = "";
+      else if (elig) status = "They have made time — stop before the bell";
+      else if (phase === "pre") status = "Keep going…";
+      else status = "Keep going… not eligible yet";
+    }
+    $("status-line").textContent = status;
+
+    if (!running && t === 0) {
+      $("btn-start").classList.add("show");
+      $("btn-stop").classList.remove("show");
+    }
+  }
+
+  function showResult() {
+    const type = currentType;
+    const t = elapsedSec();
+    const res = resultOf(type, t);
+    addedThisResult = false;
+    $("added-note").classList.remove("show");
+    $("btn-add").disabled = false;
+    $("name-input").value = "";
+    $("result-type-label").textContent = type.emoji + " " + type.name;
+    $("result-time").textContent = formatTime(t);
+    const v = $("verdict");
+    v.className = "verdict " + (res.eligible ? "yes" : "no");
+    v.innerHTML = (res.eligible ? "✅ Eligible" : "❌ Not eligible") +
+      '<span class="why">' + res.why + "</span>";
+    showScreen("result");
+    releaseWakeLock();
+  }
+
+  function addToList(ev) {
+    if (ev) ev.preventDefault();
+    if (addedThisResult || !currentType) return;
+    const res = resultOf(currentType, elapsedSec());
+    const list = loadList();
+    list[currentType.listCol].push({
+      name: $("name-input").value.trim(),
+      time: formatTime(elapsedSec()),
+      eligible: res.eligible,
+      type: currentType.id,
+      at: Date.now()
+    });
+    saveList(list);
+    renderList();
+    addedThisResult = true;
+    $("btn-add").disabled = true;
+    $("added-note").classList.add("show");
+  }
+
+  /* ----- manifest for Add to Home Screen ----- */
+  function installManifest() {
+    try {
+      const icon180 = document.querySelector('link[rel="apple-touch-icon"]').href;
+      const icon192 = document.querySelector('link[rel="icon"]').href;
+      const manifest = {
+        name: "Speakers League Timekeeper",
+        short_name: "Timekeeper",
+        description: "Speech timer for Speakers League and Junior Speakers League",
+        start_url: location.href.split("?")[0].split("#")[0],
+        display: "standalone",
+        background_color: "#005B79",
+        theme_color: "#005B79",
+        orientation: "portrait",
+        icons: [
+          { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+          { src: "data:image/png;base64,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", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+        ]
+      };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/json" }));
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = url;
+      document.head.appendChild(link);
+    } catch (e) {}
+  }
+
+  /* ----- events ----- */
+  document.addEventListener("pointerdown", unlockAudio, { once: true });
+  document.addEventListener("touchstart", unlockAudio, { once: true });
+  document.addEventListener("click", unlockAudio, { once: true });
+
+  document.querySelectorAll(".sound-toggle").forEach(function (b) {
+    b.addEventListener("click", function () {
+      soundOn = !soundOn;
+      localStorage.setItem(SOUND_KEY, soundOn ? "on" : "off");
+      updateSoundButton();
+      if (soundOn) { unlockAudio(); }
+    });
+  });
+  $("pick-jsl").addEventListener("click", function () { openClub("jsl"); });
+  $("pick-sl").addEventListener("click", function () { openClub("sl"); });
+  document.querySelectorAll(".btn-club-back").forEach(function (b) {
+    b.addEventListener("click", function () { openChooser(); });
+  });
+
+  $("clock-toggle").addEventListener("click", function () {
+    hideClock = !hideClock;
+    localStorage.setItem(CLOCK_KEY, hideClock ? "on" : "off");
+    updateClockToggle();
+    paint();
+  });
+
+  $("btn-start").addEventListener("click", startTimer);
+  $("btn-stop").addEventListener("click", stopTimer);
+  $("btn-reset").addEventListener("click", function () { resetTiming(true); });
+  $("btn-back").addEventListener("click", function () {
+    if (running || elapsedSec() > 0) stopTimer();
+    else { resetTiming(false); goClubHome(); }
+  });
+  $("btn-again").addEventListener("click", function () { goClubHome(); });
+  $("btn-home").addEventListener("click", function () { goClubHome(); });
+  $("add-form").addEventListener("submit", addToList);
+  document.querySelectorAll(".btn-clear-list").forEach(function (b) {
+    b.addEventListener("click", function () {
+      if (!confirm("Clear the whole Eligibility List?")) return;
+      saveList({ speakers: [], evaluators: [], impromptu: [] });
+      renderList();
+    });
+  });
+  document.querySelectorAll(".test-toggle").forEach(function (el) {
+    el.addEventListener("change", function () { setTestMode(this.checked); });
+  });
+
+  // Hidden test mode: tap a title 5 times quickly, or ?test=1
+  document.querySelectorAll(".app-title").forEach(function (title) {
+    title.addEventListener("click", function () {
+      const now = Date.now();
+      titleTaps = titleTaps.filter(function (t) { return now - t < 2500; });
+      titleTaps.push(now);
+      if (titleTaps.length >= 5) {
+        titleTaps = [];
+        document.querySelectorAll(".test-reveal").forEach(function (el) { el.classList.add("show"); });
+        const pane = document.querySelector(".screen.active .test-reveal");
+        if (pane) pane.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  });
+
+  /* ----- test hooks ----- */
+  window.__tk = {
+    TYPES: TYPES,
+    formatTime: formatTime,
+    phaseAt: phaseAt,
+    resultOf: resultOf,
+    elapsedSec: elapsedSec,
+    isRunning: function () { return running; },
+    currentType: function () { return currentType; },
+    setTestMode: setTestMode,
+    openChooser: openChooser,
+    openClub: openClub,
+    goClubHome: goClubHome,
+    currentClub: function () { return currentClub; },
+    CLUB_TYPES: CLUB_TYPES,
+    CLUB_KEY: CLUB_KEY,
+    openTimer: openTimer,
+    start: startTimer,
+    stop: stopTimer,
+    reset: function () { resetTiming(true); },
+    seek: function (sec) {
+      elapsedMs = Math.max(0, sec) * 1000;
+      if (running) startTs = performance.now() - elapsedMs / speedMul();
+      const t = elapsedSec();
+      if (currentType) {
+        if (!eligibleChimed && t >= currentType.eligibleAt && t < currentType.bell) {
+          eligibleChimed = true;
+        }
+        if (!bellRang && t >= currentType.bell) {
+          bellRang = true;
+        }
+        if (t < currentType.eligibleAt) eligibleChimed = false;
+        if (t < currentType.bell) bellRang = false;
+      }
+      paint();
+    },
+    paint: paint,
+    soundOn: function () { return soundOn; },
+    testMode: function () { return testMode; },
+    hideClock: function () { return hideClock; }
+  };
+
+  /* ----- init ----- */
+  buildClubButtons();
+  updateSoundButton();
+  updateClockToggle();
+  renderList();
+  installManifest();
+  const params = new URLSearchParams(location.search);
+  if (params.get("test") === "1" || params.get("test") === "true") setTestMode(true);
+  const clubParam = (params.get("club") || "").toLowerCase();
+  if (clubParam === "jsl" || clubParam === "sl") {
+    openClub(clubParam, true);
+  } else {
+    let saved = "";
+    try { saved = localStorage.getItem(CLUB_KEY) || ""; } catch (e) {}
+    if (saved === "jsl" || saved === "sl") openClub(saved, false);
+    else openChooser();
+  }
+})();
+</script>
+</body>
+</html>
