@@ -1290,12 +1290,9 @@
     showScreen("chooser");
   }
 
-  function openClub(club, save) {
+  function openClub(club) {
     if (club !== "jsl" && club !== "sl") return;
     currentClub = club;
-    if (save !== false) {
-      try { localStorage.setItem(CLUB_KEY, club); } catch (e) {}
-    }
     showScreen(clubScreenId(club));
     renderList();
   }
@@ -1570,7 +1567,7 @@
         name: "Speakers League Timekeeper",
         short_name: "Timekeeper",
         description: "Speech timer for Speakers League and Junior Speakers League",
-        start_url: location.href.split("?")[0].split("#")[0],
+        start_url: new URL("/", location.href).href,
         display: "standalone",
         display_override: ["fullscreen", "standalone"],
         background_color: "#121416",
@@ -1744,14 +1741,8 @@
   const params = new URLSearchParams(location.search);
   if (params.get("test") === "1" || params.get("test") === "true") setTestMode(true);
   const clubParam = (params.get("club") || "").toLowerCase();
-  if (clubParam === "jsl" || clubParam === "sl") {
-    openClub(clubParam, true);
-  } else {
-    let saved = "";
-    try { saved = localStorage.getItem(CLUB_KEY) || ""; } catch (e) {}
-    if (saved === "jsl" || saved === "sl") openClub(saved, false);
-    else openChooser();
-  }
+  if (clubParam === "jsl" || clubParam === "sl") openClub(clubParam);
+  else openChooser();
 })();
 </script>
 </body>
