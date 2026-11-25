@@ -318,13 +318,11 @@
       background: var(--signal);
       pointer-events: none;
     }
-    #timer.striped .color-field {
-      background: repeating-linear-gradient(
-        to right,
-        var(--signal) 0 60px,
-        #fff 60px 80px
-      );
-    }
+    .stripe-row { display: none; width: 100%; height: 100%; }
+    #timer.striped .color-field { background: transparent; }
+    #timer.striped .stripe-row { display: flex; }
+    .stripe-row .band { flex: 1 1 0; background: var(--signal); min-width: 0; }
+    .stripe-row .gap { flex: 0 0 8px; background: #fff; }
     #timer.pulsing .color-field {
       animation: pulse 1.2s ease-in-out infinite;
     }
@@ -335,41 +333,52 @@
     @media (prefers-reduced-motion: reduce) {
       #timer.pulsing .color-field { animation-duration: 2.4s; }
     }
-    #timer .ghost {
+    #clock-toggle {
       position: absolute;
       z-index: 3;
-      background: transparent;
-      color: inherit;
-      opacity: 0.46;
-      font-size: 0.78rem;
-      font-weight: 650;
-      letter-spacing: 0.03em;
-      padding: 12px 12px;
-      line-height: 1;
-      border-radius: 10px;
-      min-width: 44px;
-      min-height: 44px;
-    }
-    #timer .ghost.armed { opacity: 0.92; }
-    #btn-back {
-      top: calc(2px + var(--safe-top));
-      left: calc(2px + env(safe-area-inset-left, 0px));
-    }
-    #clock-toggle {
       top: calc(2px + var(--safe-top));
       right: calc(2px + env(safe-area-inset-right, 0px));
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       padding: 0;
       display: grid;
       place-items: center;
+      background: transparent;
+      color: inherit;
+      opacity: 0.62;
     }
     #clock-toggle .eye-off { display: block; }
-    #clock-toggle.on { opacity: 0.72; }
+    #clock-toggle.on { opacity: 0.9; }
     #clock-toggle.on .eye-off { display: none; }
-    #btn-stop {
-      right: calc(4px + env(safe-area-inset-right, 0px));
-      bottom: calc(2px + var(--safe-bottom));
+    .timer-dock {
+      position: absolute;
+      z-index: 3;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px calc(12px + var(--safe-bottom));
+      pointer-events: none;
+    }
+    .timer-dock .dock-btn {
+      pointer-events: auto;
+      height: 36px;
+      min-width: 76px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.42);
+      color: #fff;
+      border: 1.5px solid rgba(255, 255, 255, 0.62);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .timer-dock .dock-btn:active {
+      transform: translateY(1px);
+      background: rgba(0, 0, 0, 0.58);
     }
     #btn-stop[hidden] { display: none; }
     #timer .test-banner {
@@ -448,15 +457,15 @@
       opacity: 0.84;
     }
     #timer #btn-add-compact {
-      position: static;
       margin-top: 12px;
-      min-width: 0;
-      min-height: 0;
       padding: 8px 6px;
+      background: transparent;
+      color: inherit;
       font-size: 0.75rem;
+      font-weight: 700;
       text-decoration: underline;
       text-underline-offset: 3px;
-      opacity: 0.5;
+      opacity: 0.55;
     }
     #timer.phase-green .readout,
     #timer.phase-yellow .readout {
@@ -666,10 +675,9 @@
 
   <!-- TIMER -->
   <section id="timer" class="screen phase-pre" aria-label="Timer">
-    <div class="color-field" aria-hidden="true"></div>
-    <button type="button" class="ghost" id="btn-back">back</button>
+    <div class="color-field" aria-hidden="true"><div class="stripe-row" id="stripe-row"></div></div>
     <div class="test-banner" id="test-banner-timer">Test mode · 10× speed</div>
-    <button type="button" class="ghost eye" id="clock-toggle" aria-pressed="false" aria-label="Show time" title="Show time">
+    <button type="button" class="eye-btn" id="clock-toggle" aria-pressed="false" aria-label="Show time" title="Show time">
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
         <circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"></circle>
@@ -683,10 +691,13 @@
       <div class="compact-result" id="compact-result" hidden>
         <div class="compact-time readout" id="compact-time">0:00</div>
         <div class="compact-elig" id="compact-elig" role="status"></div>
-        <button type="button" class="ghost" id="btn-add-compact">Add to list</button>
+        <button type="button" id="btn-add-compact">Add to list</button>
       </div>
     </div>
-    <button type="button" class="ghost" id="btn-stop" hidden>stop</button>
+    <div class="timer-dock">
+      <button type="button" class="dock-btn" id="btn-back">Back</button>
+      <button type="button" class="dock-btn" id="btn-stop" hidden>Stop</button>
+    </div>
   </section>
 
   <!-- RESULT -->
@@ -773,7 +784,6 @@
 
   const LIST_KEY = "sl-timekeeper-list-v1";
   const SOUND_KEY = "sl-timekeeper-sound";
-  const CLOCK_KEY = "sl-timekeeper-hide-clock";
   const CLUB_KEY = "sl-timekeeper-club";
 
   function formatTime(sec) {
@@ -801,7 +811,6 @@
   let audioCtx = null;
   let soundOn = localStorage.getItem(SOUND_KEY) !== "off";
   let hideClock = true;
-  try { hideClock = localStorage.getItem(CLOCK_KEY) !== "off"; } catch (e) {}
 
   function unlockAudio() {
     try {
@@ -845,19 +854,84 @@
     });
   }
 
-  function playBell() {
+  let alarmOscs = [];
+  let alarmGain = null;
+  let alarmTimer = 0;
+  let alarmActive = false;
+  let alarmEndsAt = 0;
+  const ALARM_SECONDS = 15;
+
+  function stopAlarm() {
+    alarmActive = false;
+    alarmEndsAt = 0;
+    if (alarmTimer) { clearTimeout(alarmTimer); alarmTimer = 0; }
+    const ctx = audioCtx;
+    if (alarmGain && ctx) {
+      try {
+        alarmGain.gain.cancelScheduledValues(ctx.currentTime);
+        alarmGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      } catch (e) {}
+    }
+    alarmOscs.forEach(function (osc) {
+      try {
+        const when = ctx ? Math.max(ctx.currentTime, osc.__start || 0) : 0;
+        osc.stop(when + 0.015);
+      } catch (e) {}
+      try { osc.disconnect(); } catch (e) {}
+    });
+    alarmOscs = [];
+    if (alarmGain) {
+      try { alarmGain.disconnect(); } catch (e) {}
+      alarmGain = null;
+    }
+  }
+
+  function playAlarm() {
     if (!soundOn) return;
     unlockAudio();
     if (!audioCtx) return;
-    const t0 = audioCtx.currentTime + 0.02;
-    for (let i = 0; i < 5; i++) {
-      const t = t0 + i * 0.42;
-      // bright alarm-bell ding with partials
-      tone(880, t, 0.55, "sine", 0.32, 740);
-      tone(880 * 2.0, t, 0.4, "sine", 0.14, 1500);
-      tone(880 * 2.76, t, 0.35, "sine", 0.08);
-      tone(440, t, 0.6, "triangle", 0.12, 400);
+    stopAlarm();
+    const ctx = audioCtx;
+    const t0 = ctx.currentTime + 0.03;
+    const dur = ALARM_SECONDS;
+    const oscA = ctx.createOscillator();
+    const oscB = ctx.createOscillator();
+    const g = ctx.createGain();
+    oscA.type = "square";
+    oscB.type = "triangle";
+    oscA.__start = t0;
+    oscB.__start = t0;
+    const step = 0.045;
+    for (let t = 0; t < dur; t += step) {
+      const high = Math.floor(t / step) % 2 === 0;
+      oscA.frequency.setValueAtTime(high ? 1568 : 1318, t0 + t);
+      oscB.frequency.setValueAtTime(high ? 2093 : 1760, t0 + t);
     }
+    const burst = 0.38;
+    const gap = 0.18;
+    const cycle = burst + gap;
+    g.gain.setValueAtTime(0.0001, t0);
+    for (let t = 0; t + 0.02 < dur; t += cycle) {
+      const on = t0 + t;
+      const off = Math.min(t0 + dur, on + burst);
+      g.gain.setValueAtTime(0.0001, on);
+      g.gain.exponentialRampToValueAtTime(0.11, on + 0.012);
+      if (off - 0.02 > on + 0.02) g.gain.setValueAtTime(0.11, off - 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, off);
+    }
+    oscA.connect(g);
+    oscB.connect(g);
+    g.connect(ctx.destination);
+    oscA.start(t0);
+    oscB.start(t0);
+    const end = t0 + dur;
+    oscA.stop(end);
+    oscB.stop(end);
+    alarmOscs = [oscA, oscB];
+    alarmGain = g;
+    alarmActive = true;
+    alarmEndsAt = Date.now() + dur * 1000;
+    alarmTimer = setTimeout(stopAlarm, (dur + 0.2) * 1000);
   }
 
   function vibrate(pattern) {
@@ -1026,10 +1100,13 @@
 
   function updateSoundButton() {
     document.querySelectorAll(".sound-toggle").forEach(function (b) {
+      const label = soundOn
+        ? "Sound on. Tap to turn all sounds off."
+        : "Sound off. Tap to turn all sounds on.";
       b.textContent = soundOn ? "🔊" : "🔇";
       b.setAttribute("aria-pressed", soundOn ? "true" : "false");
-      b.setAttribute("aria-label", soundOn ? "Sound on" : "Sound off");
-      b.title = soundOn ? "Sound on" : "Sound off";
+      b.setAttribute("aria-label", label);
+      b.title = label;
     });
   }
 
@@ -1041,30 +1118,34 @@
     b.title = hideClock ? "Show time" : "Hide time";
   }
 
-  let arm = null;
-  function disarm() {
-    if (!arm) return;
-    clearTimeout(arm.timer);
-    arm.el.classList.remove("armed");
-    arm.el.textContent = arm.rest;
-    arm = null;
-  }
-  function armControl(el, prompt, action) {
-    if (arm && arm.el === el) {
-      const fn = arm.action;
-      disarm();
-      fn();
-      return;
+  function layoutStripes() {
+    const row = $("stripe-row");
+    const timer = $("timer");
+    if (!row || !timer) return;
+    const w = timer.clientWidth || window.innerWidth;
+    const white = 8;
+    const target = 72;
+    let n = Math.round((w - target) / (target + white));
+    if (n < 2) n = 2;
+    let color = (w - n * white) / (n + 1);
+    while (n > 2 && color < 48) {
+      n -= 1;
+      color = (w - n * white) / (n + 1);
     }
-    disarm();
-    arm = {
-      el: el,
-      rest: el.textContent,
-      action: action,
-      timer: setTimeout(disarm, 2500)
-    };
-    el.textContent = prompt;
-    el.classList.add("armed");
+    if (row.dataset.count === String(n) && row.childElementCount === n * 2 + 1) return;
+    row.dataset.count = String(n);
+    row.textContent = "";
+    for (let i = 0; i < n; i++) {
+      const band = document.createElement("div");
+      band.className = "band";
+      const gap = document.createElement("div");
+      gap.className = "gap";
+      row.appendChild(band);
+      row.appendChild(gap);
+    }
+    const end = document.createElement("div");
+    end.className = "band";
+    row.appendChild(end);
   }
 
   function openTimer(typeId) {
@@ -1078,7 +1159,9 @@
   function resetTiming(keepScreen) {
     running = false;
     stopped = false;
-    disarm();
+    hideClock = true;
+    updateClockToggle();
+    stopAlarm();
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     elapsedMs = 0;
@@ -1111,6 +1194,7 @@
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     stopped = true;
+    stopAlarm();
     releaseWakeLock();
     paint();
   }
@@ -1126,7 +1210,7 @@
     }
     if (!bellRang && t >= type.bell) {
       bellRang = true;
-      playBell();
+      playAlarm();
       vibrate([400, 120, 400, 120, 400, 120, 600]);
     }
     paint();
@@ -1146,7 +1230,7 @@
     const t = elapsedSec();
     const type = currentType;
     const phase = phaseAt(type, t);
-    const pulsing = !stopped && t >= type.bell - 10 && t < type.bell;
+    const pulsing = !stopped && t >= type.red && t < type.bell;
     const striped = t >= type.eligibleAt && t < type.bell;
     const idle = !running && !stopped && t === 0;
 
@@ -1154,7 +1238,10 @@
     timerEl.classList.remove("phase-pre", "phase-green", "phase-yellow", "phase-red", "phase-bell", "pulsing", "striped");
     timerEl.classList.add("phase-" + phase);
     if (pulsing) timerEl.classList.add("pulsing");
-    if (striped) timerEl.classList.add("striped");
+    if (striped) {
+      timerEl.classList.add("striped");
+      layoutStripes();
+    }
     setThemeColor(PHASE_COLOR[phase] || "#121416");
 
     const clock = $("clock");
@@ -1166,10 +1253,10 @@
     const stopBtn = $("btn-stop");
     if (running) {
       stopBtn.hidden = false;
-      if (!stopBtn.classList.contains("armed")) stopBtn.textContent = "stop";
+      stopBtn.textContent = "Stop";
     } else if (stopped) {
       stopBtn.hidden = false;
-      if (!stopBtn.classList.contains("armed")) stopBtn.textContent = "reset";
+      stopBtn.textContent = "Reset";
     } else {
       stopBtn.hidden = true;
     }
@@ -1259,6 +1346,7 @@
     b.addEventListener("click", function () {
       soundOn = !soundOn;
       localStorage.setItem(SOUND_KEY, soundOn ? "on" : "off");
+      if (!soundOn) stopAlarm();
       updateSoundButton();
       if (soundOn) { unlockAudio(); }
     });
@@ -1271,34 +1359,26 @@
 
   $("clock-toggle").addEventListener("click", function () {
     hideClock = !hideClock;
-    try { localStorage.setItem(CLOCK_KEY, hideClock ? "on" : "off"); } catch (e) {}
     updateClockToggle();
     paint();
   });
 
   $("timer").addEventListener("click", function (e) {
     if (e.target.closest("button")) return;
-    disarm();
     if (!running && !stopped && elapsedSec() === 0) startTimer();
   });
   $("timer").addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  window.addEventListener("resize", function () {
+    const row = $("stripe-row");
+    if (row) row.dataset.count = "";
+    if (currentType) paint();
+  });
 
   $("btn-stop").addEventListener("click", function () {
-    if (running) {
-      armControl($("btn-stop"), "stop?", stopTimer);
-      return;
-    }
-    if (stopped) armControl($("btn-stop"), "reset?", function () { resetTiming(true); });
+    if (running) { stopTimer(); return; }
+    if (stopped) resetTiming(true);
   });
   $("btn-back").addEventListener("click", function () {
-    if (running) {
-      armControl($("btn-back"), "back?", function () {
-        resetTiming(false);
-        goClubHome();
-      });
-      return;
-    }
-    disarm();
     resetTiming(false);
     goClubHome();
   });
@@ -1375,7 +1455,9 @@
     paint: paint,
     soundOn: function () { return soundOn; },
     testMode: function () { return testMode; },
-    hideClock: function () { return hideClock; }
+    hideClock: function () { return hideClock; },
+    alarmOn: function () { return alarmActive; },
+    alarmMsLeft: function () { return alarmActive ? Math.max(0, alarmEndsAt - Date.now()) : 0; }
   };
 
   /* ----- init ----- */
