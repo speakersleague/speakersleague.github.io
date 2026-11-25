@@ -6,7 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#005B79" />
+  <meta name="theme-color" content="#121416" />
+  <meta name="apple-mobile-web-app-title" content="Timekeeper" />
   <meta name="format-detection" content="telephone=no" />
   <meta name="description" content="Speakers League and Junior Speakers League speech timekeeper" />
   <title>Timekeeper</title>
@@ -21,7 +22,7 @@
       --green: #00E000;
       --yellow: #FFEB00;
       --red: #FF0A0A;
-      --pre: #3A4149;
+      --pre: #121416;
       --ink: #102027;
       --paper: #F4F7F8;
       --card: #FFFFFF;
@@ -35,17 +36,22 @@
       margin: 0; padding: 0;
       height: 100%;
       height: 100dvh;
-      background: var(--paper);
+      min-height: 100dvh;
+      background: #121416;
       color: var(--ink);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
     }
     button, input { font-family: inherit; }
     button { cursor: pointer; border: none; }
     .screen {
-      position: absolute; inset: 0;
+      position: fixed; inset: 0;
+      width: 100%;
+      height: 100dvh;
       display: none;
       flex-direction: column;
       overflow: hidden;
@@ -273,52 +279,6 @@
     .club-pick .ages { font-size: 1.05rem; font-weight: 700; color: var(--muted); }
     .type-btn.span2 { grid-column: 1 / -1; min-height: 108px; }
 
-    /* ===== TIMER ===== */
-    #timer {
-      color: #fff;
-      background: var(--pre);
-      transition: background-color 0.35s ease;
-    }
-    #timer.phase-pre { background: var(--pre); color: #fff; }
-    #timer.phase-green { background: var(--green); color: #000; }
-    #timer.phase-yellow { background: var(--yellow); color: #000; }
-    #timer.phase-red, #timer.phase-bell { background: var(--red); color: #fff; }
-    #timer.pulsing {
-      animation: pulse 1.2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.28); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      #timer.pulsing { animation-duration: 2.4s; }
-    }
-    .timer-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: calc(8px + var(--safe-top)) 10px 8px;
-      flex-shrink: 0;
-    }
-    .timer-bar .tb {
-      min-width: 52px; height: 44px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.22);
-      color: inherit;
-      font-weight: 800;
-      font-size: 0.95rem;
-      padding: 0 10px;
-      border: 2px solid rgba(255,255,255,0.35);
-    }
-    #timer.phase-green .tb, #timer.phase-yellow .tb {
-      background: rgba(0,0,0,0.12);
-      border-color: rgba(0,0,0,0.35);
-    }
-    .timer-title {
-      flex: 1; text-align: center;
-      font-weight: 800; font-size: 1.05rem; line-height: 1.15;
-    }
-    .timer-title .sub { display: block; font-size: 0.72rem; font-weight: 700; opacity: 0.85; }
     .test-banner {
       display: none;
       text-align: center;
@@ -331,98 +291,181 @@
       text-transform: uppercase;
     }
     .test-banner.on { display: block; }
-    .timer-main {
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== TIMER ===== */
+    #timer {
+      --signal: var(--pre);
+      color: #fff;
+      background: var(--signal);
+    }
+    #timer.phase-pre { --signal: var(--pre); color: #fff; }
+    #timer.phase-green { --signal: var(--green); color: #000; }
+    #timer.phase-yellow { --signal: var(--yellow); color: #000; }
+    #timer.phase-red, #timer.phase-bell { --signal: var(--red); color: #fff; }
+    #timer .color-field {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--signal);
+      pointer-events: none;
+    }
+    #timer.striped .color-field {
+      background: repeating-linear-gradient(
+        to right,
+        var(--signal) 0 60px,
+        #fff 60px 80px
+      );
+    }
+    #timer.pulsing .color-field {
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.28); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #timer.pulsing .color-field { animation-duration: 2.4s; }
+    }
+    #timer .ghost {
+      position: absolute;
+      z-index: 3;
+      background: transparent;
+      color: inherit;
+      opacity: 0.46;
+      font-size: 0.78rem;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      padding: 12px 12px;
+      line-height: 1;
+      border-radius: 10px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    #timer .ghost.armed { opacity: 0.92; }
+    #btn-back {
+      top: calc(2px + var(--safe-top));
+      left: calc(2px + env(safe-area-inset-left, 0px));
+    }
+    #clock-toggle {
+      top: calc(2px + var(--safe-top));
+      right: calc(2px + env(safe-area-inset-right, 0px));
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+    }
+    #clock-toggle .eye-off { display: block; }
+    #clock-toggle.on { opacity: 0.72; }
+    #clock-toggle.on .eye-off { display: none; }
+    #btn-stop {
+      right: calc(4px + env(safe-area-inset-right, 0px));
+      bottom: calc(2px + var(--safe-bottom));
+    }
+    #btn-stop[hidden] { display: none; }
+    #timer .test-banner {
+      position: absolute;
+      z-index: 3;
+      top: calc(16px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      background: transparent;
+      color: inherit;
+      opacity: 0.4;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #timer .test-banner.on { display: block; }
+    .timer-stage {
+      position: relative;
+      z-index: 1;
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 8px 16px 12px;
       gap: 8px;
+      padding: 48px 28px;
+      text-align: center;
+      pointer-events: none;
     }
+    .timer-stage button { pointer-events: auto; }
+    .tap-hint {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+      opacity: 0.42;
+    }
+    .tap-hint[hidden] { display: none; }
     .clock {
-      font-size: clamp(4.2rem, 22vw, 7.2rem);
+      font-size: clamp(4.2rem, 22vw, 7rem);
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0.02em;
       line-height: 0.95;
-      text-shadow: 0 2px 0 rgba(0,0,0,0.15);
     }
-    .clock.hidden-clock { letter-spacing: 0.12em; }
-    .status-line {
-      min-height: 1.6rem;
-      font-size: 1.05rem;
-      font-weight: 700;
-      opacity: 0.95;
-      text-align: center;
+    .clock.is-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
     }
-    .badge {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: #fff;
-      color: #0B7A0B;
-      border: 4px solid #0B7A0B;
-      font-size: 1.7rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-      padding: 10px 22px;
-      border-radius: 999px;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-      animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
-      text-align: center;
-      line-height: 1.1;
-    }
-    .badge.show { display: flex; }
-    #timer.phase-bell .badge.eligible, #timer.over .badge.eligible { display: none; }
-    .badge.overtime {
-      display: none;
-      background: #111;
-      color: #FFEB00;
-      border-color: #FFEB00;
-      color: #FFEB00;
-    }
-    .badge.overtime.show { display: flex; }
-    @keyframes pop {
-      0% { transform: scale(0.6); opacity: 0; }
-      70% { transform: scale(1.08); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .timer-actions {
-      width: 100%;
-      max-width: 420px;
+    .compact-result {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding-bottom: calc(12px + var(--safe-bottom));
+      align-items: center;
     }
-    .huge {
-      width: 100%;
-      height: 88px;
-      border-radius: 22px;
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      border: 4px solid rgba(0,0,0,0.25);
-      box-shadow: 0 5px 0 rgba(0,0,0,0.25);
-    }
-    .huge:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
-    #btn-start { background: #fff; color: var(--teal); display: none; }
-    #btn-start.show { display: block; }
-    #btn-stop { background: var(--coral); color: #fff; display: none; }
-    #btn-stop.show { display: block; }
-    #btn-reset {
-      background: rgba(0,0,0,0.2);
-      color: inherit;
-      height: 52px;
-      border-radius: 14px;
-      font-size: 1.1rem;
+    .compact-result[hidden] { display: none; }
+    .compact-time {
+      font-size: clamp(2.6rem, 14vw, 4rem);
       font-weight: 800;
-      border: 2px solid rgba(255,255,255,0.3);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      line-height: 1;
     }
-    #timer.phase-green #btn-reset, #timer.phase-yellow #btn-reset {
-      border-color: rgba(0,0,0,0.3);
+    .compact-elig {
+      margin-top: 6px;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: 0.01em;
+      opacity: 0.84;
+    }
+    #timer #btn-add-compact {
+      position: static;
+      margin-top: 12px;
+      min-width: 0;
+      min-height: 0;
+      padding: 8px 6px;
+      font-size: 0.75rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      opacity: 0.5;
+    }
+    #timer.phase-green .readout,
+    #timer.phase-yellow .readout {
+      text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+    }
+    #timer.phase-pre .readout,
+    #timer.phase-red .readout,
+    #timer.phase-bell .readout {
+      text-shadow: 0 0 10px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.4);
     }
 
     /* ===== RESULT ===== */
@@ -542,7 +585,7 @@
     <div class="home-body">
       <div class="test-banner">Test mode · 10× speed</div>
       <p class="legend">
-        Press the button for the kind of speech. Then press <strong>START</strong> when the speaker begins.
+        Press the button for the kind of speech. Then tap the screen when the speaker begins.
         <br />
         <span class="dot g"></span> Green = keep going
         · <span class="dot y"></span> Yellow = wrap up
@@ -588,7 +631,7 @@
     <div class="home-body">
       <div class="test-banner">Test mode · 10× speed</div>
       <p class="legend">
-        Press the button for the kind of speech. Then press <strong>START</strong> when the speaker begins.
+        Press the button for the kind of speech. Then tap the screen when the speaker begins.
         <br />
         <span class="dot g"></span> Green = keep going
         · <span class="dot y"></span> Yellow = wrap up
@@ -623,23 +666,27 @@
 
   <!-- TIMER -->
   <section id="timer" class="screen phase-pre" aria-label="Timer">
-    <div class="timer-bar">
-      <button type="button" class="tb" id="btn-back">Back</button>
-      <div class="timer-title" id="timer-type-label"></div>
-      <button type="button" class="tb" id="clock-toggle" aria-pressed="false" aria-label="Hide clock">👁</button>
-    </div>
+    <div class="color-field" aria-hidden="true"></div>
+    <button type="button" class="ghost" id="btn-back">back</button>
     <div class="test-banner" id="test-banner-timer">Test mode · 10× speed</div>
-    <div class="timer-main">
-      <div class="clock" id="clock" aria-live="polite">0:00</div>
-      <div class="status-line" id="status-line">Press START when they begin</div>
-      <div class="badge eligible" id="eligible-badge" role="status">⭐ ELIGIBLE!</div>
-      <div class="badge overtime" id="overtime-badge" role="alert">🔔 TIME!<br /><span style="font-size:1rem;font-weight:800">Over time – not eligible</span></div>
+    <button type="button" class="ghost eye" id="clock-toggle" aria-pressed="false" aria-label="Show time" title="Show time">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+        <circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"></circle>
+        <path class="eye-off" d="M5 19 L19 5"></path>
+      </svg>
+    </button>
+    <div class="timer-stage">
+      <p class="sr-only" id="timer-type-label"></p>
+      <p class="tap-hint" id="tap-hint">Tap to start</p>
+      <div class="clock readout is-hidden" id="clock" aria-live="polite">0:00</div>
+      <div class="compact-result" id="compact-result" hidden>
+        <div class="compact-time readout" id="compact-time">0:00</div>
+        <div class="compact-elig" id="compact-elig" role="status"></div>
+        <button type="button" class="ghost" id="btn-add-compact">Add to list</button>
+      </div>
     </div>
-    <div class="timer-actions" style="padding-left:16px;padding-right:16px;align-self:center">
-      <button type="button" class="huge show" id="btn-start">START</button>
-      <button type="button" class="huge" id="btn-stop">STOP</button>
-      <button type="button" id="btn-reset">Reset</button>
-    </div>
+    <button type="button" class="ghost" id="btn-stop" hidden>stop</button>
   </section>
 
   <!-- RESULT -->
@@ -753,7 +800,8 @@
   /* ----- audio ----- */
   let audioCtx = null;
   let soundOn = localStorage.getItem(SOUND_KEY) !== "off";
-  let hideClock = localStorage.getItem(CLOCK_KEY) === "on";
+  let hideClock = true;
+  try { hideClock = localStorage.getItem(CLOCK_KEY) !== "off"; } catch (e) {}
 
   function unlockAudio() {
     try {
@@ -875,6 +923,7 @@
   let currentType = null;
   let currentClub = null;
   let running = false;
+  let stopped = false;
   let startTs = 0;
   let elapsedMs = 0;
   let raf = 0;
@@ -904,12 +953,18 @@
     if (testMode) document.querySelectorAll(".test-reveal").forEach(function (el) { el.classList.add("show"); });
   }
 
+  function setThemeColor(color) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", color);
+  }
+
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
     const el = $(id);
     el.classList.add("active");
     const body = el.querySelector(".home-body, .chooser-body");
     if (body) body.scrollTop = 0;
+    if (id !== "timer") setThemeColor("#121416");
   }
 
   function clubScreenId(club) {
@@ -980,22 +1035,50 @@
 
   function updateClockToggle() {
     const b = $("clock-toggle");
-    b.textContent = hideClock ? "🙈" : "👁";
-    b.setAttribute("aria-pressed", hideClock ? "true" : "false");
-    b.setAttribute("aria-label", hideClock ? "Show clock" : "Hide clock");
+    b.classList.toggle("on", !hideClock);
+    b.setAttribute("aria-pressed", hideClock ? "false" : "true");
+    b.setAttribute("aria-label", hideClock ? "Show time" : "Hide time");
+    b.title = hideClock ? "Show time" : "Hide time";
+  }
+
+  let arm = null;
+  function disarm() {
+    if (!arm) return;
+    clearTimeout(arm.timer);
+    arm.el.classList.remove("armed");
+    arm.el.textContent = arm.rest;
+    arm = null;
+  }
+  function armControl(el, prompt, action) {
+    if (arm && arm.el === el) {
+      const fn = arm.action;
+      disarm();
+      fn();
+      return;
+    }
+    disarm();
+    arm = {
+      el: el,
+      rest: el.textContent,
+      action: action,
+      timer: setTimeout(disarm, 2500)
+    };
+    el.textContent = prompt;
+    el.classList.add("armed");
   }
 
   function openTimer(typeId) {
     currentType = TYPES[typeId];
     resetTiming(false);
-    $("timer-type-label").innerHTML = currentType.emoji + " " + currentType.name +
-      '<span class="sub">' + currentType.times + '</span>';
+    $("timer-type-label").textContent = currentType.emoji + " " + currentType.name;
     showScreen("timer");
     paint();
   }
 
   function resetTiming(keepScreen) {
     running = false;
+    stopped = false;
+    disarm();
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
     elapsedMs = 0;
@@ -1003,27 +1086,23 @@
     eligibleChimed = false;
     bellRang = false;
     releaseWakeLock();
-    $("btn-start").classList.add("show");
-    $("btn-stop").classList.remove("show");
-    $("eligible-badge").classList.remove("show");
-    $("overtime-badge").classList.remove("show");
-    $("timer").classList.remove("pulsing", "over");
     if (keepScreen) paint();
   }
 
   function startTimer() {
-    if (running || !currentType) return;
+    if (running || stopped || !currentType) return;
     unlockAudio();
     running = true;
+    stopped = false;
     startTs = performance.now() - elapsedMs / speedMul();
-    $("btn-start").classList.remove("show");
-    $("btn-stop").classList.add("show");
     requestWakeLock();
+    paint();
     raf = requestAnimationFrame(tick);
   }
 
   function stopTimer() {
     if (!currentType) return;
+    if (!running && elapsedSec() === 0) return;
     if (running) {
       const now = performance.now();
       elapsedMs = (now - startTs) * speedMul();
@@ -1031,9 +1110,9 @@
     }
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
+    stopped = true;
     releaseWakeLock();
     paint();
-    showResult();
   }
 
   function tick(now) {
@@ -1054,45 +1133,55 @@
     raf = requestAnimationFrame(tick);
   }
 
+  const PHASE_COLOR = {
+    pre: "#121416",
+    green: "#00E000",
+    yellow: "#FFEB00",
+    red: "#FF0A0A",
+    bell: "#FF0A0A"
+  };
+
   function paint() {
     if (!currentType) return;
     const t = elapsedSec();
     const type = currentType;
     const phase = phaseAt(type, t);
-    const pulsing = t >= type.bell - 10 && t < type.bell;
-    const elig = t >= type.eligibleAt && t < type.bell;
-    const over = t >= type.bell;
+    const pulsing = !stopped && t >= type.bell - 10 && t < type.bell;
+    const striped = t >= type.eligibleAt && t < type.bell;
+    const idle = !running && !stopped && t === 0;
 
     const timerEl = $("timer");
-    timerEl.classList.remove("phase-pre", "phase-green", "phase-yellow", "phase-red", "phase-bell", "pulsing", "over");
+    timerEl.classList.remove("phase-pre", "phase-green", "phase-yellow", "phase-red", "phase-bell", "pulsing", "striped");
     timerEl.classList.add("phase-" + phase);
     if (pulsing) timerEl.classList.add("pulsing");
-    if (over) timerEl.classList.add("over");
+    if (striped) timerEl.classList.add("striped");
+    setThemeColor(PHASE_COLOR[phase] || "#121416");
 
     const clock = $("clock");
-    if (hideClock) {
-      clock.textContent = "• • •";
-      clock.classList.add("hidden-clock");
+    clock.textContent = formatTime(t);
+    clock.classList.toggle("is-hidden", hideClock || stopped);
+
+    $("tap-hint").hidden = !idle;
+
+    const stopBtn = $("btn-stop");
+    if (running) {
+      stopBtn.hidden = false;
+      if (!stopBtn.classList.contains("armed")) stopBtn.textContent = "stop";
+    } else if (stopped) {
+      stopBtn.hidden = false;
+      if (!stopBtn.classList.contains("armed")) stopBtn.textContent = "reset";
     } else {
-      clock.textContent = formatTime(t);
-      clock.classList.remove("hidden-clock");
+      stopBtn.hidden = true;
     }
 
-    $("eligible-badge").classList.toggle("show", elig);
-    $("overtime-badge").classList.toggle("show", over);
-
-    let status = "Press START when they begin";
-    if (running || t > 0) {
-      if (over) status = "";
-      else if (elig) status = "They have made time — stop before the bell";
-      else if (phase === "pre") status = "Keep going…";
-      else status = "Keep going… not eligible yet";
-    }
-    $("status-line").textContent = status;
-
-    if (!running && t === 0) {
-      $("btn-start").classList.add("show");
-      $("btn-stop").classList.remove("show");
+    const result = $("compact-result");
+    if (stopped) {
+      const res = resultOf(type, t);
+      result.hidden = false;
+      $("compact-time").textContent = formatTime(t);
+      $("compact-elig").textContent = res.eligible ? "Eligible" : "Not eligible";
+    } else {
+      result.hidden = true;
     }
   }
 
@@ -1144,8 +1233,9 @@
         description: "Speech timer for Speakers League and Junior Speakers League",
         start_url: location.href.split("?")[0].split("#")[0],
         display: "standalone",
-        background_color: "#005B79",
-        theme_color: "#005B79",
+        display_override: ["fullscreen", "standalone"],
+        background_color: "#121416",
+        theme_color: "#121416",
         orientation: "portrait",
         icons: [
           { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
@@ -1181,17 +1271,40 @@
 
   $("clock-toggle").addEventListener("click", function () {
     hideClock = !hideClock;
-    localStorage.setItem(CLOCK_KEY, hideClock ? "on" : "off");
+    try { localStorage.setItem(CLOCK_KEY, hideClock ? "on" : "off"); } catch (e) {}
     updateClockToggle();
     paint();
   });
 
-  $("btn-start").addEventListener("click", startTimer);
-  $("btn-stop").addEventListener("click", stopTimer);
-  $("btn-reset").addEventListener("click", function () { resetTiming(true); });
+  $("timer").addEventListener("click", function (e) {
+    if (e.target.closest("button")) return;
+    disarm();
+    if (!running && !stopped && elapsedSec() === 0) startTimer();
+  });
+  $("timer").addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  $("btn-stop").addEventListener("click", function () {
+    if (running) {
+      armControl($("btn-stop"), "stop?", stopTimer);
+      return;
+    }
+    if (stopped) armControl($("btn-stop"), "reset?", function () { resetTiming(true); });
+  });
   $("btn-back").addEventListener("click", function () {
-    if (running || elapsedSec() > 0) stopTimer();
-    else { resetTiming(false); goClubHome(); }
+    if (running) {
+      armControl($("btn-back"), "back?", function () {
+        resetTiming(false);
+        goClubHome();
+      });
+      return;
+    }
+    disarm();
+    resetTiming(false);
+    goClubHome();
+  });
+  $("btn-add-compact").addEventListener("click", function () {
+    if (!stopped || !currentType) return;
+    showResult();
   });
   $("btn-again").addEventListener("click", function () { goClubHome(); });
   $("btn-home").addEventListener("click", function () { goClubHome(); });
@@ -1230,6 +1343,7 @@
     resultOf: resultOf,
     elapsedSec: elapsedSec,
     isRunning: function () { return running; },
+    isStopped: function () { return stopped; },
     currentType: function () { return currentType; },
     setTestMode: setTestMode,
     openChooser: openChooser,
