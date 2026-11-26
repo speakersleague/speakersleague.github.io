@@ -274,11 +274,23 @@
     }
     .club-pick:active { filter: brightness(0.94); }
     .club-pick.sl { background: var(--teal); }
+    .club-badge {
+      width: 84px;
+      height: 84px;
+      margin-top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+    }
     .club-pick .club-logo {
-      height: 64px;
+      max-width: 64px;
+      max-height: 56px;
       width: auto;
-      max-width: 68%;
-      margin-top: 4px;
+      height: auto;
+      margin: 0;
       object-fit: contain;
       display: block;
     }
@@ -586,11 +598,11 @@
       <div class="test-banner">Test mode · 10× speed</div>
       <div class="club-picks">
         <button type="button" class="club-pick sl" id="pick-sl">
-          <img class="club-logo" alt="" src="img/sl-logo.png" />
+          <span class="club-badge"><img class="club-logo" alt="" src="img/sl-logo.png" /></span>
           <div class="name">Speakers League</div>
         </button>
         <button type="button" class="club-pick" id="pick-jsl">
-          <img class="club-logo" alt="" src="img/jsl-logo.png" />
+          <span class="club-badge"><img class="club-logo" alt="" src="img/jsl-logo.png" /></span>
           <div class="name">Junior Speakers League</div>
           <div class="ages">ages 7–9</div>
         </button>
